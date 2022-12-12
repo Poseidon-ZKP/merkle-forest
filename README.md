@@ -39,6 +39,12 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
         end
 
         subgraph Merkle-Forest
+            subgraph Lookup-Table
+                LT1(1..4)
+                LT5(5..8)
+            end
+            LT1 -.-> FC1234;
+            LT5 -.-> FC5678;
             FC1234((C1-4)) --> FC12((C12)) & FC34((C34));
             FC5678((C5-8)) --> FC56((C56)) & FC78((C78));
             FC12-->FL1(1) & FL2(2)
@@ -47,7 +53,7 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
             FC78-->FL7(7) & FL8(8)
         end
 
-        R --> FC1234
+        R -.-> LT1
 
 ```
 
