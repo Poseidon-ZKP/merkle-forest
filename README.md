@@ -37,10 +37,6 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
             C56-->L5(5) & L6(6)
             C78-->L7(7) & L8(8)
         end
-
-        single-MT --> Merkle-Forest
-
-
 ```
 
 
