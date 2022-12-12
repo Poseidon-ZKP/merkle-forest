@@ -29,8 +29,8 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
 ```mermaid
     graph TB;
         R((Root))-->C1234 & C5678;
-        C1234((C1234)) --> C12((C12)) & C34((C34));
-        C5678((C5678)) --> C56((C56)) & C78((C78));
+        C1234((C1-4)) --> C12((C12)) & C34((C34));
+        C5678((C5-8)) --> C56((C56)) & C78((C78));
         C12-->L1(1) & L2(2)
         C34-->L3(3) & L4(4)
         C56-->L5(5) & L6(6)
