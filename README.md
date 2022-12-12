@@ -37,6 +37,16 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
             C56-->L5(5) & L6(6)
             C78-->L7(7) & L8(8)
         end
+
+        subgraph Merkle-Forest
+            FC1234((C1-4)) --> FC12((C12)) & FC34((C34));
+            FC5678((C5-8)) --> FC56((C56)) & FC78((C78));
+            FC12-->FL1(1) & FL2(2)
+            FC34-->FL3(3) & FL4(4)
+            FC56-->FL5(5) & FL6(6)
+            FC78-->FL7(7) & FL8(8)
+        end
+
 ```
 
 
