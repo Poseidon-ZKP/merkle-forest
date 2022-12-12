@@ -26,6 +26,16 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
     1. decouple the circuit size from Gurantee.
     2. Group Size = 2^Gurantee = 2^H * 2^(G - H) = 2^H * K, K = 2^(G-H)
 
+```mermaid
+    graph TB;
+        R((Root))-->C12((C12))
+        R-->C34((C34));
+        C12-->L1(1)
+        C12-->L2(2)
+        C34-->L3(3)
+        C34-->L4(4)
+
+```
 
 
 
