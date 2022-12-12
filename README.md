@@ -45,8 +45,8 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
             end
             LT1 -.-> FC1234;
             LT5 -.-> FC5678;
-            FC1234((C1-4)) --> FC12((C12)) & FC34((C34));
-            FC5678((C5-8)) --> FC56((C56)) & FC78((C78));
+            FC1234((R1-4)) --> FC12((C12)) & FC34((C34));
+            FC5678((R5-8)) --> FC56((C56)) & FC78((C78));
             FC12-->FL1(1) & FL2(2)
             FC34-->FL3(3) & FL4(4)
             FC56-->FL5(5) & FL6(6)
