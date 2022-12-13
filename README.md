@@ -53,7 +53,7 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
             FC78-->FL7(7) & FL8(8)
         end
 
-        R -.-> LT1
+        single-MT -.-> Merkle-Forest
 
 ```
 
