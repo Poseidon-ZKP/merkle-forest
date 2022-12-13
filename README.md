@@ -85,13 +85,12 @@ Fully compatible with Semaphore.
 
 ### Create Group  
 
-
-    ```shell
-        function new_eas(
-            uint tree_depth,
-            uint gurantee,
-            uint zeroValue)
-    ```
+```shell
+    function new_eas(
+        uint tree_depth,
+        uint gurantee,
+        uint zeroValue)
+```
 
 underline
 * increamental MT 
