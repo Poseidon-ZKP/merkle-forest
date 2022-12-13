@@ -5,7 +5,7 @@
 
 ## Abstract
 
-
+ZK-Friendly Group Membership proof data structure.
 
 ## Motivation
 
@@ -75,31 +75,75 @@ Fully compatible with Semaphore.
 
 ## Specification
 
-### Create Group
-create_eas
+### Definitions
 
-    depth 20 -> 10, tune.
+* [identity](https://semaphore.appliedzkp.org/docs/guides/identities)
+* group
+* eas
+* Loopup Table
+* gurantee
 
-increamental MT 
-sparse MT
+### Create Group  
 
-### Membership Prove
-contain
 
+    ```shell
+        function new_eas(
+            uint tree_depth,
+            uint gurantee,
+            uint zeroValue)
+    ```
+
+underline
+* increamental MT 
+* sparse MT
 
 ### Join Group
-append
 
-    Dynamic Growth
+```shell
+    function insert(
+        uint256 groupId,
+        uint256 identity)
+```
 
-Join, L-> R
+Group Growth Strategy
+* Dynamic Growth
+
+* Sequencial
+* Random
     Hashed :  less shard expose , auto reorgnize.  re-blance. (tree split, no 2 different group)
+
+### Membership Prove
+
+```shell
+    function contains(
+        uint256 groupId,
+        uint256 identity,
+        uint256[] calldata proofSiblings,
+        uint8[] calldata proofPathIndices)
+```
+
+cost reduce
+* prover cost
+* gas cost
+
+
 
 ### Leave Group(optional)
 
-Privacy/Public Leavy
+```shell
+    function remove(
+        uint256 groupId,
+        uint256 identity,
+        uint256[] calldata proofSiblings,
+        uint8[] calldata proofPathIndices)
+```
+
+
+* Privacy Leave
+* Public Leave
 
 ### Composable/CP-Snark(optional)
+
 CP-SNARK and -> or ? 
 
 

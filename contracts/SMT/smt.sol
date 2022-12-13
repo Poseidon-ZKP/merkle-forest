@@ -31,13 +31,13 @@ contract smt {
     }
 
     function new_eas(
-        uint h,
+        uint tree_depth,
         uint gurantee,
         uint256 zeroValue
     ) public returns(uint) {
         GROUP_ID ++;
-        eas[GROUP_ID].H = h;
-        eas[GROUP_ID].K = gurantee - h;
+        eas[GROUP_ID].H = tree_depth;
+        eas[GROUP_ID].K = gurantee - tree_depth;
         eas[GROUP_ID].zeroValue = zeroValue;
         eas[GROUP_ID].treeNum = 0;
         _createTree(GROUP_ID);
