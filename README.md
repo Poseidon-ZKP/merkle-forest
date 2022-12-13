@@ -34,6 +34,8 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
         style single-MT fill:#FBFCFC
         style Merkle-Forest fill:#FBFCFC
         style Lookup-Table fill:#FBFCFC
+        style MT1 fill:#FBFCFC
+        style MT2 fill:#FBFCFC
         subgraph single-MT
             R((Root))-->C1234 & C5678;
             C1234((C1-4)) --> C12((C12)) & C34((C34));
@@ -51,12 +53,18 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
             end
             LT1 -.-> FC1234;
             LT5 -.-> FC5678;
-            FC1234((R1-4)) --> FC12((C12)) & FC34((C34));
-            FC5678((R5-8)) --> FC56((C56)) & FC78((C78));
-            FC12-->FL1(1) & FL2(2)
-            FC34-->FL3(3) & FL4(4)
-            FC56-->FL5(5) & FL6(6)
-            FC78-->FL7(7) & FL8(8)
+
+            subgraph MT1
+                FC1234((R1-4)) --> FC12((C12)) & FC34((C34));
+                FC12-->FL1(1) & FL2(2)
+                FC34-->FL3(3) & FL4(4)
+            end
+
+            subgraph MT2
+                FC5678((R5-8)) --> FC56((C56)) & FC78((C78));
+                FC56-->FL5(5) & FL6(6)
+                FC78-->FL7(7) & FL8(8)
+            end
         end
 
         single-MT -.-> Merkle-Forest
@@ -95,5 +103,5 @@ Privacy/Public Leavy
 CP-SNARK and -> or ? 
 
 
- ## Reference Implementation
- TODO
+ ## [Reference Implementation](./contracts/SMT/smt.sol)
+ 

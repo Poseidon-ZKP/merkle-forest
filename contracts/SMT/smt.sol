@@ -9,7 +9,7 @@ struct EAS {
     mapping(uint256 => IncrementalTreeData) merkleTree;
     uint treeNum;
     uint256 zeroValue;
-    mapping(uint256 => uint256) member2tree;
+    mapping(uint256 => uint256) member2tree;    // mapping too big?
 }
 
 contract smt {
