@@ -30,26 +30,15 @@ Now, we reduce the huge-MT prove issue to
 we will find that, this kind of reduce will provide scalable group membership, and many following benefits, and on the other side, privacy decrease， which is acceptable in practicial case.
 
 
-## Specification
-
-### Definitions
+## Definitions
 
 * [identity](https://semaphore.appliedzkp.org/docs/guides/identities) : a big number on behalf of member
 * group : a group for member join, and prove the membership.
 * gurantee : group capability, support gurantee=10, group can have maxium 2^10 member to join
-* eas
-* Group Membership : a proof 
-* ZK
-* Scalable
-* Merkel Tree
-* Merkle Proof
-* Merkle Forest
+* Group Membership : prove member exist in group, usally by it's merkle path.
 * EAS
 
-### Framework
-Philosoph is trade-off
-    1. Privacy
-    2. Efficent (ZK-Prover/On-chain)
+## Specification
 
 We Propose Merkle Forest, using sharding of multi smaller group, instead of single huge group.
     1. decouple the circuit size from Gurantee.
@@ -65,7 +54,7 @@ more important is , Merkle tree itself not scalable, there is no way to enlarge 
 ZK using merkle path to prove the group membership, so the circuit size is related(linear) to Group Gurantee. 
 
 Server issues exist for the single MT Group:
-* 1. group size is defined when create,   not support infinicate group.
+* prover cost 
 * 2. prover time growth (linear??) with Gurantee.
 * 3. onchain gas cost increase(linearly) for group operation(insert..)
 * 4. concurrency competition issue when multi user join the single group
@@ -119,6 +108,7 @@ decouple , only 1 trust setup, scalable.
 
 
 
+## Interface
 
 ### Create Group  
 
@@ -128,6 +118,9 @@ decouple , only 1 trust setup, scalable.
         uint gurantee,
         uint zeroValue)
 ```
+
+creates a new EAS, with user-provided anonymity guarantee, for example, if the user set the anonymity guarantee to be 10, then the shard size of this EAS is 2
+10 = 1024, which means this EAS has 1/1024 anonymity.
 
 underline
 * increamental MT 
