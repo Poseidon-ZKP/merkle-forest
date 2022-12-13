@@ -1,3 +1,6 @@
+[TOC]
+
+
 # Merkle Forest
 
 ## Abstract
@@ -60,10 +63,6 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
 
 ```
 
-
-
-
-
 ## Specification
 
 ### Create Group
@@ -96,16 +95,3 @@ CP-SNARK and -> or ?
 
  ## Reference Implementation
  TODO
-
-
-# Setup
-```shell
-nvm use lts/hydrogen
-npm install
-npx hardhat run scripts/smt.ts
-```
-
-# Gas
-
-
-# TODO
