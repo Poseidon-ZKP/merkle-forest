@@ -1,7 +1,7 @@
 [TOC]
 
 
-# Merkle Forest : Scalable Group Membership for ZK
+# Merkle Forest : A zk-friendly Elastic Group Design
 
 ## Abstract
 
@@ -15,11 +15,18 @@ obviously, the exist circuit cannot be reused if user want a higher Gurantee.
 Suppose the below sceniors:
 1. User have a group of grantee 10, and it's almost full. user want to enlarge the group, but have to create a new group, and ask member to rejoin.
 2. User want to create a group, but can't decide the gurantee yet, it will depand on how the bussiness going. Becouse of above 1, the only chocie is choose the maxium possible gurantee. even at the beginning, when the member small size, still have to generate full merkle path proof, result in non-efficent cost for both prover and on-chain verify.
+3. [Optional] User may join and leave group frenquently, suppose totolly 1 million join/leave, even though the total members at any time never exceed 1024, a group with grantee > 20 is still needed.
 
 so we can get a conclusion : fixed-size merkle tree can not meet the variety/dynamic user demands for group memebership.
 
-Here We propose "Merkle Forest", to provide scalable group membership for ZKDAPP.
-The Basic idea is 
+Let's return back to the 1st demand, and think more fine-graind about the "grantee", it can be defined as the probability of member can be exposed in group, suppose grantee=10, then the group size will be 2**10 = 1024, the memeber have 1/1024 probability been recorgnized. for grantee=20, the probability is ~1/1million.
+
+Does user really need such a low probability, maybe yes for some case, maybe not neccearry for other case.
+For the later case, user actually need
+1. acceptable grantee, for privacy protect
+2. max group size, which limit the join behaviour
+
+So Here We propose "Merkle Forest" to represent the "max group size", to provide elastic group design.
 * "Combine multiple reuseable merkle tree" as the group.
 * provide a way for each member to join a specific merkle tree
 
@@ -33,10 +40,10 @@ we will find that, this kind of reduce will provide scalable group membership, a
 ## Definitions
 
 * [identity](https://semaphore.appliedzkp.org/docs/guides/identities) : a big number on behalf of member
-* group : a group for member join, and prove the membership.
-* gurantee : group capability, support gurantee=10, group can have maxium 2^10 member to join
+* Group : a group for member join, and prove the membership.
+* Gurantee : group capability, support gurantee=10, group can have maxium 2^10 member to join
 * Group Membership : prove member exist in group, usally by it's merkle path.
-* EAS
+* EG : Elastic Group, whose size dynamic growth.
 
 ## Specification
 
@@ -119,10 +126,15 @@ decouple , only 1 trust setup, scalable.
         uint zeroValue)
 ```
 
-creates a new EAS, with user-provided anonymity guarantee, for example, if the user set the anonymity guarantee to be 10, then the shard size of this EAS is 2
+creates a new EG, with user-provided anonymity guarantee, for example, if the user set the anonymity guarantee to be 10, then the shard size of this EAS is 2
 10 = 1024, which means this EAS has 1/1024 anonymity.
 
+Privacy Level : real gurantee.
+
+
 if user don't give gurantee, infinite 
+
+dynamic growth
 
 underline
 * increamental MT 
@@ -173,9 +185,26 @@ cost reduce
 * Privacy Leave
 * Public Leave
 
+### Group Gurantee Change
+
+Elastic Group
+
+```shell
+    function enlargeGroup(uint groupId, uint gurantee)
+    function downsizeGroup(uint groupId, uint gurantee)
+```
+
+increase/decrese group gurantee, group admin operation.
+decrese only success if group's member number not exceed the new gurantee.
+
+
 ### migrate exist group
 
 exist group as 1 MT of the MT Forest.
+
+problem is 
+
+gas limit
 
 ### Composable/CP-Snark(optional)
 
