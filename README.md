@@ -3,16 +3,6 @@
 
 # Merkle Forest : Scalable Group Membership for ZK
 
-## Keywords
-
-* Group Membership
-* ZK
-* Scalable
-* Merkel Tree
-* Merkle Proof
-* Merkle Forest
-* EAS
-
 ## Abstract
 
 
@@ -44,11 +34,17 @@ we will find that, this kind of reduce will provide scalable group membership, a
 
 ### Definitions
 
-* [identity](https://semaphore.appliedzkp.org/docs/guides/identities)
-* group
+* [identity](https://semaphore.appliedzkp.org/docs/guides/identities) : a big number on behalf of member
+* group : a group for member join, and prove the membership.
+* gurantee : group capability, support gurantee=10, group can have maxium 2^10 member to join
 * eas
-* Loopup Table
-* gurantee
+* Group Membership : a proof 
+* ZK
+* Scalable
+* Merkel Tree
+* Merkle Proof
+* Merkle Forest
+* EAS
 
 ### Framework
 Philosoph is trade-off
