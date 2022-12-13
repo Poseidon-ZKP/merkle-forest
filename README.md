@@ -63,6 +63,8 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
 
 ```
 
+Fully compatible with Semaphore.
+
 ## Specification
 
 ### Create Group

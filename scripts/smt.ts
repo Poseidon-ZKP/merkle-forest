@@ -3,6 +3,8 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { PoseidonT3__factory, Smt__factory } from "./types";
 import { poseidonContract } from "circomlibjs"
+import { Group } from "@semaphore-protocol/group"
+import { MerkleProof } from "@zk-kit/incremental-merkle-tree"
 
 async function main(
 ) {
@@ -39,10 +41,20 @@ async function main(
     const s = Smt__factory.connect(sc.address, owner)
     console.log("smt : ", s.address)
 
-    const eas = await (await s.new_eas(2, 3, 0, {gasLimit: 1000000})).wait()
-    console.log("eas : ", eas)
+    const TREE_DEPTH = 2
+    const GURANTEE = 3
+    await (await s.new_eas(TREE_DEPTH, GURANTEE, 0, {gasLimit: 1000000})).wait()
+    const groupId = await s.callStatic.GROUP_ID()
 
+    const IDENTITY = "1234"
+    await (await s.insert(groupId, IDENTITY)).wait()
 
+    // merkle proof
+    const group = new Group(TREE_DEPTH)
+    group.addMembers([IDENTITY])
+    const merkleProof: MerkleProof = group.generateProofOfMembership(group.indexOf(IDENTITY))
+
+    await (await s.remove(groupId, IDENTITY, merkleProof.siblings, merkleProof.pathIndices)).wait()
 }
 
 main()

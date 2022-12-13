@@ -63,6 +63,7 @@ contract smt {
         eas[groupId].member2tree[identity] = treeId;
     }
 
+    // TODO : IBT verify is private, so using remove for check contains
     function contains(
         uint256 groupId,
         uint256 identity,
@@ -71,6 +72,18 @@ contract smt {
     ) public {
         uint treeId = eas[groupId].member2tree[identity];
         require(treeId != 0, "not in group!!");
+        //eas[groupId].merkleTree[treeId].verify(identity, proofSiblings, proofPathIndices);
+    }
 
+    function remove(
+        uint256 groupId,
+        uint256 identity,
+        uint256[] calldata proofSiblings,
+        uint8[] calldata proofPathIndices
+    ) public {
+        uint treeId = eas[groupId].member2tree[identity];
+        require(treeId != 0, "not in group!!");
+        eas[groupId].merkleTree[treeId].remove(identity, proofSiblings, proofPathIndices);
+        delete eas[groupId].member2tree[identity];
     }
 }
