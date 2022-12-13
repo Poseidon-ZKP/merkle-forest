@@ -28,7 +28,8 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
 
 ```mermaid
     flowchart LR;
-        style single-MT color:#fff
+        style single-MT fill:#FBFCFC
+        style Merkle-Forest fill:#FBFCFC
         subgraph single-MT
             R((Root))-->C1234 & C5678;
             C1234((C1-4)) --> C12((C12)) & C34((C34));
