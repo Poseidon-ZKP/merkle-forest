@@ -22,12 +22,12 @@ contract smt {
     uint public GROUP_ID;
 
     function _createTree(
-        uint256 groupId,
-        uint256 treeId
+        uint256 groupId
     ) internal virtual {
         uint merkleTreeDepth = eas[groupId].H;
         uint zeroValue = eas[groupId].zeroValue;
-        eas[groupId].merkleTree[treeId].init(merkleTreeDepth, zeroValue);
+        eas[groupId].merkleTree[eas[GROUP_ID].treeNum + 1].init(merkleTreeDepth, zeroValue);
+        eas[groupId].treeNum++;
     }
 
     function new_eas(
@@ -39,7 +39,8 @@ contract smt {
         eas[GROUP_ID].H = h;
         eas[GROUP_ID].K = gurantee - h;
         eas[GROUP_ID].zeroValue = zeroValue;
-        _createTree(GROUP_ID, 1);
+        eas[GROUP_ID].treeNum = 0;
+        _createTree(GROUP_ID);
         emit GroupCreated(GROUP_ID, h, gurantee);
         return GROUP_ID;
     }
@@ -51,15 +52,13 @@ contract smt {
         // decide which tree to join, or new tree, split tree
         // growth strategy : L->R + Split Group
         //              TODO : random insert
-        uint treeId = eas[groupId].treeNum + 1;
-        if (eas[groupId].merkleTree[treeId].numberOfLeaves >= 2^(eas[groupId].H)) {
-            _createTree(GROUP_ID, treeId);
-        } else {
-            // insert to current tree
-            eas[groupId].merkleTree[treeId].insert(identity);
+        if (eas[groupId].merkleTree[eas[groupId].treeNum].numberOfLeaves >= 2**(eas[groupId].H)) {
+            _createTree(GROUP_ID);
         }
 
-        eas[groupId].treeNum++;
+        // insert to current tree
+        uint treeId = eas[groupId].treeNum;
+        eas[groupId].merkleTree[treeId].insert(identity);
         eas[groupId].member2tree[identity] = treeId;
     }
 

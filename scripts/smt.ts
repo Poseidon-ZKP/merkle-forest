@@ -46,15 +46,16 @@ async function main(
     await (await s.new_eas(TREE_DEPTH, GURANTEE, 0, {gasLimit: 1000000})).wait()
     const groupId = await s.callStatic.GROUP_ID()
 
-    const IDENTITY = "1234"
+    const IDENTITY = BigInt("4748413744389535528134168535257611038161526665618075543952104564006072002863")
     await (await s.insert(groupId, IDENTITY)).wait()
 
     // merkle proof
     const group = new Group(TREE_DEPTH)
     group.addMembers([IDENTITY])
     const merkleProof: MerkleProof = group.generateProofOfMembership(group.indexOf(IDENTITY))
+    console.log("merkleProof : ", merkleProof)
 
-    await (await s.remove(groupId, IDENTITY, merkleProof.siblings, merkleProof.pathIndices)).wait()
+    await (await s.remove(groupId, IDENTITY, merkleProof.siblings, merkleProof.pathIndices, {gasLimit : 1000000})).wait()
 }
 
 main()
