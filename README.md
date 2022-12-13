@@ -3,9 +3,18 @@
 
 # Merkle Forest : Scalable Group Membership for ZK
 
+## Keywords
+
+* Group Membership
+* ZK
+* Scalable
+* Merkel Tree
+* Merkle Proof
+* Merkle Forest
+* EAS
+
 ## Abstract
 
-Scalable Group Membership for ZK.
 
 ## Motivation
 
@@ -19,29 +28,17 @@ Suppose the below sceniors:
 
 so we can get a conclusion : fixed-size/static merkle tree can not meet the variety/dynamic user demands for group memebership.
 
-Here We propose "Merkle Forest", to provide scalable group membership.
-The Basic idea is "Combine multiple reuseable merkle tree" as the group.
+Here We propose "Merkle Forest", to provide scalable group membership for ZKDAPP.
+The Basic idea is 
+* "Combine multiple reuseable merkle tree" as the group.
+* provide a way for each member to join a specific merkle tree
 
+Now, we reduce the huge-MT prove issue to
+* small-MT prove
+* lookup issue.
 
-the decrease of privacy is acceptable in practicial case. 
+we will find that, this kind of reduce will provide scalable group membership, and many following benefits, and on the other side, privacy decrease， which is acceptable in practicial case.
 
-also some other advantage:
-1. heavy trust setup for zkey (TODO : data, depth-20 need 2 hours on macbook pro). very big zkey file, become experience if user have to download for proof generate local.
-2. inifinte group
-3. build circuit themself.
-
-more important is , Merkle tree itself not scalable, there is no way to enlarge exist group(new circuit for new MT),  such as infinite group demands.
-
-ZK using merkle path to prove the group membership, so the circuit size is related(linear) to Group Gurantee. 
-
-Server issues exist for the single MT Group:
-* 1. group size is defined when create,   not support infinicate group.
-* 2. prover time growth (linear??) with Gurantee.
-* 3. onchain gas cost increase(linearly) for group operation(insert..)
-* 4. concurrency competition issue when multi user join the single group
-    (1) reorder tx by relay, not native
-
-decouple , only 1 trust setup, scalable.
 
 ## Specification
 
@@ -61,6 +58,26 @@ Philosoph is trade-off
 We Propose Merkle Forest, using sharding of multi smaller group, instead of single huge group.
     1. decouple the circuit size from Gurantee.
     2. Group Size = 2^Gurantee = 2^H * 2^(G - H) = 2^H * K, K = 2^(G-H)
+
+also some other advantage:
+1. heavy trust setup for zkey (TODO : data, depth-20 need 2 hours on macbook pro). very big zkey file, become experience if user have to download for proof generate local.
+2. inifinte group
+3. build circuit themself.
+
+more important is , Merkle tree itself not scalable, there is no way to enlarge exist group(new circuit for new MT),  such as infinite group demands.
+
+ZK using merkle path to prove the group membership, so the circuit size is related(linear) to Group Gurantee. 
+
+Server issues exist for the single MT Group:
+* 1. group size is defined when create,   not support infinicate group.
+* 2. prover time growth (linear??) with Gurantee.
+* 3. onchain gas cost increase(linearly) for group operation(insert..)
+* 4. concurrency competition issue when multi user join the single group
+    (1) reorder tx by relay, not native
+
+decouple , only 1 trust setup, scalable.
+
+
 
 ```mermaid
     flowchart LR;
@@ -103,6 +120,8 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
         single-MT -.-> Merkle-Forest
 
 ```
+
+
 
 
 ### Create Group  
