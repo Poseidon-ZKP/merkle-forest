@@ -39,6 +39,8 @@ async function main(
     const s = Smt__factory.connect(sc.address, owner)
     console.log("smt : ", s.address)
 
+    const eas = await (await s.new_eas(2, 3, 0, {gasLimit: 1000000})).wait()
+    console.log("eas : ", eas)
 
 
 }

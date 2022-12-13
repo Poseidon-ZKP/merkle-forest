@@ -6,7 +6,8 @@ import "@zk-kit/incremental-merkle-tree.sol/IncrementalBinaryTree.sol";
 struct EAS {
     uint H;
     uint K;
-    IncrementalTreeData[] merkleTree;
+    mapping(uint256 => IncrementalTreeData) merkleTree;
+    uint treeNum;
     uint256 zeroValue;
     mapping(uint256 => uint256) member2tree;
 }
@@ -38,7 +39,7 @@ contract smt {
         eas[GROUP_ID].H = h;
         eas[GROUP_ID].K = gurantee - h;
         eas[GROUP_ID].zeroValue = zeroValue;
-        _createTree(GROUP_ID, 0);
+        _createTree(GROUP_ID, 1);
         emit GroupCreated(GROUP_ID, h, gurantee);
         return GROUP_ID;
     }
@@ -50,14 +51,15 @@ contract smt {
         // decide which tree to join, or new tree, split tree
         // growth strategy : L->R + Split Group
         //              TODO : random insert
-        uint treeId = eas[groupId].merkleTree.length - 1;
+        uint treeId = eas[groupId].treeNum + 1;
         if (eas[groupId].merkleTree[treeId].numberOfLeaves >= 2^(eas[groupId].H)) {
-            _createTree(GROUP_ID, treeId+1);
+            _createTree(GROUP_ID, treeId);
         } else {
             // insert to current tree
             eas[groupId].merkleTree[treeId].insert(identity);
         }
 
+        eas[groupId].treeNum++;
         eas[groupId].member2tree[identity] = treeId;
     }
 
@@ -69,6 +71,6 @@ contract smt {
     ) public {
         uint treeId = eas[groupId].member2tree[identity];
         require(treeId != 0, "not in group!!");
-        
+
     }
 }
