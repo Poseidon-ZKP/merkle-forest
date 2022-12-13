@@ -9,7 +9,8 @@ struct EAS {
     mapping(uint256 => IncrementalTreeData) merkleTree;
     uint treeNum;
     uint256 zeroValue;
-    mapping(uint256 => uint256) member2tree;    // mapping too big?
+    // TODO :  mapping too big?  map[A] = X, map[B] = X <--> map[A op B] = X ?
+    mapping(uint256 => uint256) member2tree;
 }
 
 contract smt {
@@ -24,13 +25,14 @@ contract smt {
     function _createTree(
         uint256 groupId
     ) internal virtual {
+        require(eas[groupId].treeNum <= 2**eas[groupId].K, "Group Full!!");
         uint merkleTreeDepth = eas[groupId].H;
         uint zeroValue = eas[groupId].zeroValue;
         eas[groupId].merkleTree[eas[GROUP_ID].treeNum + 1].init(merkleTreeDepth, zeroValue);
         eas[groupId].treeNum++;
     }
 
-    function new_eas(
+    function createGroup(
         uint tree_depth,
         uint gurantee,
         uint256 zeroValue
@@ -41,7 +43,7 @@ contract smt {
         eas[GROUP_ID].zeroValue = zeroValue;
         eas[GROUP_ID].treeNum = 0;
         _createTree(GROUP_ID);
-        emit GroupCreated(GROUP_ID, h, gurantee);
+        emit GroupCreated(GROUP_ID, tree_depth, gurantee);
         return GROUP_ID;
     }
 
@@ -84,5 +86,30 @@ contract smt {
         require(treeId != 0, "not in group!!");
         eas[groupId].merkleTree[treeId].remove(identity, proofSiblings, proofPathIndices);
         delete eas[groupId].member2tree[identity];
+    }
+
+    function enlargeGroup(
+        uint groupId,
+        uint gurantee
+    ) public {  // TODO : admin only
+        eas[groupId].K = gurantee - eas[groupId].H;
+    }
+
+    function downsizeGroup(
+        uint groupId,
+        uint gurantee
+    ) public {  // TODO : admin only
+        require(eas[groupId].treeNum <= 2 ** (gurantee - eas[groupId].H));
+        eas[groupId].K = gurantee - eas[groupId].H;
+    }
+
+
+    function migrate(
+        IncrementalTreeData storage merkleTree,
+        uint groupId
+    ) internal {
+        // merkle tree --> group
+
+        // add items in lookup table for each member
     }
 }

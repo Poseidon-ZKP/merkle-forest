@@ -16,7 +16,7 @@ Suppose the below sceniors:
 1. User have a group of grantee 10, and it's almost full. user want to enlarge the group, but have to create a new group, and ask member to rejoin.
 2. User want to create a group, but can't decide the gurantee yet, it will depand on how the bussiness going. Becouse of above 1, the only chocie is choose the maxium possible gurantee. even at the beginning, when the member small size, still have to generate full merkle path proof, result in non-efficent cost for both prover and on-chain verify.
 
-so we can get a conclusion : fixed-size/static merkle tree can not meet the variety/dynamic user demands for group memebership.
+so we can get a conclusion : fixed-size merkle tree can not meet the variety/dynamic user demands for group memebership.
 
 Here We propose "Merkle Forest", to provide scalable group membership for ZKDAPP.
 The Basic idea is 
@@ -113,7 +113,7 @@ decouple , only 1 trust setup, scalable.
 ### Create Group  
 
 ```shell
-    function new_eas(
+    function createGroup(
         uint tree_depth,
         uint gurantee,
         uint zeroValue)
@@ -121,6 +121,8 @@ decouple , only 1 trust setup, scalable.
 
 creates a new EAS, with user-provided anonymity guarantee, for example, if the user set the anonymity guarantee to be 10, then the shard size of this EAS is 2
 10 = 1024, which means this EAS has 1/1024 anonymity.
+
+if user don't give gurantee, infinite 
 
 underline
 * increamental MT 
@@ -171,6 +173,10 @@ cost reduce
 * Privacy Leave
 * Public Leave
 
+### migrate exist group
+
+exist group as 1 MT of the MT Forest.
+
 ### Composable/CP-Snark(optional)
 
 CP-SNARK and -> or ? 
@@ -180,6 +186,3 @@ CP-SNARK and -> or ?
 
 Fully compatible with Semaphore Interface, minor changes for implement eas.
 
-## migrate exist group
-
-exist group as 1 MT of the MT Forest.
