@@ -1,7 +1,7 @@
 [TOC]
 
 
-# Merkle Forest
+# Merkle Forest : Scalable Group Membership for ZK
 
 ## Abstract
 
