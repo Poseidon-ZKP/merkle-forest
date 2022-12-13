@@ -27,7 +27,7 @@ We Propose Merkle Forest, using sharding of multi smaller group, instead of sing
     2. Group Size = 2^Gurantee = 2^H * 2^(G - H) = 2^H * K, K = 2^(G-H)
 
 ```mermaid
-    graph TD;
+    flowchart LR;
         subgraph single-MT
             R((Root))-->C1234 & C5678;
             C1234((C1-4)) --> C12((C12)) & C34((C34));
