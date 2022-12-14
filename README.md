@@ -2,58 +2,55 @@
 
 ## Abstract
 
+## Background
+[Semaphore](https://semaphore.appliedzkp.org/) is ZKP-powered protocol that allows users to:
+* Prove their membership of a group 
+* Send signals on a particular topic as a member of a group
+without revealing their identity. At the core of this protocol lies the following [circuit](https://semaphore.appliedzkp.org/docs/technical-reference/circuits)
+![](https://github.com/semaphore-protocol/semaphore/raw/main/packages/circuits/scheme.png)
+
+The first two private inputs, siblings and path indices, form a path in a Merkle tree, which represents the group whose leaves are the identity commitments of its members. The [Merkle tree verifier](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/tree.circom) outputs the root of the Merkle tree, while checking that the siblings and path indices describe a valid path from the identity commitment leaf to the root. Then the contract compares this root to the existing one. 
+
+## Terminology
+* [identity](https://semaphore.appliedzkp.org/docs/guides/identities): a triple consisting of a trapdoor, a nullifier and a commitment. The commitment is computed from the trapdoor and nullifier and is inserted as a leaf in the groups it belongs to.
+* Group: In the Semaphore protocol, a Merkle tree. In our proposal, a Merkle forest. 
+* Privacy/anonimity guarantee: a security parameter, the higher it is the lower the probability a member can be exposed in a group. In the Semaphore protocol above, it is the depth of the Merkle tree. For a guarantee $g$, the Merkle tree can store $2^g$ leaves, so the minimum exposure probability, achieved when the group reaches its maximum capacity, is $1/2^g$.
+* Max group size. Max number of members a group can host. In the Semaphore protocol, this is the number of leaves the Merkle tree can store.
+* EG: Elastic Group, whose size grows dynamically.
 
 ## Motivation
+In the Semaphore example above, groups are modelled by binary incremental Merkle trees with fixed-size depth (privacy guarantee). The native way to prove group membership, as explained above, is to verify a Merkle path in a zk-circuit, which means this circuit depends on the tree depth. 
 
-Binary Increamental Merkle Tree, With Fixed-size Depth(Gurantee), is generally used as Group. The navitve way to prove group membership, is verify merkle path in zk-cirucit, which means circuit is coupled with the tree depth. 
+Suppose the below scenarios:
+1. We have an almost full group. In order to enlarge the group, we would have to create a new group, and ask every member to rejoin.
+2. We want to create a group, but can't decide the guarantee yet, as it will depand on how the bussiness is going. The only choice in this case is the maximum possible guarantee, otherwise we may need to create a new group as soon as we need to enlarge ours as explained in point 1. But then, even at the beginning, when there are few members, we still have to generate full Merkle path proofs, resulting in non-efficent cost for both the prover and the on-chain verifier.
+3. [Optional] Users may join and leave a group frenquently, e.g. suppose 1 million users join and then leave. Even though the number of members at any time never exceeds the max group size, a group with a higher guarantee is still needed.
 
-obviously, the exist circuit cannot be reused if user want a higher Gurantee.
+As a conclusion: fixed-size Merkle trees cannot meet the dynamic user demands for group memebership.
 
-Suppose the below sceniors:
-1. User have a group of grantee 10, and it's almost full. user want to enlarge the group, but have to create a new group, and ask member to rejoin.
-2. User want to create a group, but can't decide the gurantee yet, it will depand on how the bussiness going. Becouse of above 1, the only chocie is choose the maxium possible gurantee. even at the beginning, when the member small size, still have to generate full merkle path proof, result in non-efficent cost for both prover and on-chain verify.
-3. [Optional] User may join and leave group frenquently, suppose totolly 1 million join/leave, even though the total members at any time never exceed 1024, a group with grantee > 20 is still needed.
+Another issue with the single Merkle tree model employed in the Semaphore protocol is how the max group size $K$ is a function of the privacy guarantee $g$, namely $K = 2^g$. If we have a group of size $m$, but only need a privacy guarantee of $g' < g$, using the parameter $g$ would result in larger proofs, slower proving time and a much costlier trusted setup.
 
-so we can get a conclusion : fixed-size merkle tree can not meet the variety/dynamic user demands for group memebership.
+## The solution: Merkle forest
+We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$ has the same meaning as in the single Merkle tree case, i.e., a group member will have an exposure probability of $1/2^g$. The new parameter $n$ is the number of trees in the forest, so in this case the max group size is $n*2^g$.
 
-Let's return back to the 1st demand, and think more fine-graind about the "grantee", it can be defined as the probability of member can be exposed in group, suppose grantee=10, then the group size will be 2**10 = 1024, the memeber have 1/1024 probability been recorgnized. for grantee=20, the probability is ~1/1million.
+With the new elastic group design. the original huge Merkle tree membership circuit can be reduced to
+* a smaller Merkle tree membership circuit, which outputs a root
+* find the output root in a look-up table
 
-Does user really need such a low probability, maybe yes for some case, maybe not neccearry for other case.
-For the later case, user actually need
-1. acceptable grantee, for privacy protect
-2. max group size, which limit the join behaviour
-
-So We need redefine Group Property with a new formula G(grantee, K), where grantee have the same meaning in merkle tree, while K describe the group size in a metric of merkle tree number, that is what we called "Merkle Forest".
-
-With the new elastic group design. the original huge-MT prove can be reduced to
-* small-MT prove
-* find the MT for group member
-
-and get many benefits :
-1. elastic group : could be enlarge/downsize according to demands.
-2. inifinte group
-3. smaller/constant merkle proof circuit, faster prover.
-4. lightweight/reusable trust setup for zkey (TODO : data, depth-20 need 2 hours on macbook pro). very big zkey file, become experience if user have to download for proof generate local.
-5. onchain gas cost ??
-6. reduce concurrency competition when multi user join the single group
-    (1) [optional] reorder tx by relay, not native
-
-
-## Definitions
-
-* [identity](https://semaphore.appliedzkp.org/docs/guides/identities) : a big number on behalf of member
-* Group : a group for member join, and prove the membership.
-* Anonymity Gurantee : privacy level for anonymity, support gurantee=10, 1/1024 probablity of member been recorgnized in the group.
-* Group Membership : prove member exist in group, usally by it's merkle path.
-* EG : Elastic Group, whose size dynamic growth.
+## Advantages
+1. Elastic group : could be enlarged/downsized according to demands.
+2. Possibly inifinte group.
+3. Smaller Merkle proof circuits, faster prover.
+4. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a macbook pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
+5. Reduced concurrency competition when several users join a single group.
 
 ## Specification
 
 ### Semaphore Compatible
 
-"Merkle Forest" is based on Merkle-Tree prove, which means no circuit change, the exist semaphore circuit and corresponding sdk still works.
+"Merkle Forest" is based on Merkle tree prove, which means no circuit changes are needed, the existig Semaphore circuit and corresponding sdk still work.
 
-An onchain lookup table is introduced to mapping member to corresponding merkle tree.
+An onchain lookup table is introduced to map members to the corresponding Merkle tree.
 
 
 ```mermaid
@@ -102,12 +99,12 @@ An onchain lookup table is introduced to mapping member to corresponding merkle 
 
 ```shell
     function createGroup(
-        uint gurantee,
-        uint size,
+        uint guarantee,
+        uint number_of_trees,
         uint zeroValue)
 ```
 
-creates a new Elastic Group, with user-provided anonymity guarantee and group capability, for example, if the user set the anonymity guarantee to be 10 and size to be 12, then the shard merkle tree size of this EG is 2 ** 10 = 1024, which means this EAS has 1/1024 anonymity, and this EG can have maxium 2 ** (12 -10) = 4 shard merkle tree.
+Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^10 = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^10*4 = 4096$ leaves.
 
 if user don't give gurantee, infinite 
 
