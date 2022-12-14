@@ -1,4 +1,4 @@
-# Merkle Forest : A zk-friendly Elastic Group Design
+# Merkle Forest : ZK-friendly Elastic Group
 
 ## Abstract
 
@@ -36,7 +36,7 @@ and get many benefits :
 4. lightweight/reusable trust setup for zkey (TODO : data, depth-20 need 2 hours on macbook pro). very big zkey file, become experience if user have to download for proof generate local.
 5. onchain gas cost ??
 6. reduce concurrency competition when multi user join the single group
-    (1) reorder tx by relay, not native
+    (1) [optional] reorder tx by relay, not native
 
 
 ## Definitions
@@ -48,6 +48,13 @@ and get many benefits :
 * EG : Elastic Group, whose size dynamic growth.
 
 ## Specification
+
+### Semaphore Compatible
+
+"Merkle Forest" is based on Merkle-Tree prove, which means no circuit change, the exist semaphore circuit and corresponding sdk still works.
+
+A lookup table is introduced to mapping member to corresponding merkle tree.
+
 
 ```mermaid
     flowchart LR;
