@@ -43,7 +43,7 @@ and get many benefits :
 
 * [identity](https://semaphore.appliedzkp.org/docs/guides/identities) : a big number on behalf of member
 * Group : a group for member join, and prove the membership.
-* Gurantee : group capability, support gurantee=10, group can have maxium 2^10 member to join
+* Anonymity Gurantee : privacy level for anonymity, support gurantee=10, 1/1024 probablity of member been recorgnized in the group.
 * Group Membership : prove member exist in group, usally by it's merkle path.
 * EG : Elastic Group, whose size dynamic growth.
 
@@ -53,7 +53,7 @@ and get many benefits :
 
 "Merkle Forest" is based on Merkle-Tree prove, which means no circuit change, the exist semaphore circuit and corresponding sdk still works.
 
-A lookup table is introduced to mapping member to corresponding merkle tree.
+An onchain lookup table is introduced to mapping member to corresponding merkle tree.
 
 
 ```mermaid
@@ -98,7 +98,7 @@ A lookup table is introduced to mapping member to corresponding merkle tree.
 
 ```
 
-### Create Group  
+### Create Elastic Group  
 
 ```shell
     function createGroup(
@@ -107,11 +107,7 @@ A lookup table is introduced to mapping member to corresponding merkle tree.
         uint zeroValue)
 ```
 
-creates a new EG, with user-provided anonymity guarantee, for example, if the user set the anonymity guarantee to be 10, then the shard size of this EAS is 2
-10 = 1024, which means this EAS has 1/1024 anonymity.
-
-Privacy Level : real gurantee.
-
+creates a new Elastic Group, with user-provided anonymity guarantee and group capability, for example, if the user set the anonymity guarantee to be 10 and size to be 12, then the shard merkle tree size of this EG is 2 ** 10 = 1024, which means this EAS has 1/1024 anonymity, and this EG can have maxium 2 ** (12 -10) = 4 shard merkle tree.
 
 if user don't give gurantee, infinite 
 

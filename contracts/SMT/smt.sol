@@ -41,7 +41,7 @@ contract smt {
         eas[GROUP_ID].H = gurantee;
         eas[GROUP_ID].K = size - gurantee;
         eas[GROUP_ID].zeroValue = zeroValue;
-        eas[GROUP_ID].treeNum = 0;
+        eas[GROUP_ID].treeNum = 2**256 - 1;
         _createTree(GROUP_ID);
         emit GroupCreated(GROUP_ID, gurantee, size);
         return GROUP_ID;
