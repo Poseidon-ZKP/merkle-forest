@@ -26,15 +26,20 @@ For the later case, user actually need
 1. acceptable grantee, for privacy protect
 2. max group size, which limit the join behaviour
 
-So Here We propose "Merkle Forest" to represent the "max group size", to provide elastic group design.
-* "Combine multiple reuseable merkle tree" as the group.
-* provide a way for each member to join a specific merkle tree
+So We need redefine Group Property with a new formula G(grantee, K), where grantee have the same meaning in merkle tree, while K describe the group size in a metric of merkle tree number, that is what we called "Merkle Forest".
 
-Now, we reduce the huge-MT prove issue to
+With the new elastic group design. the original huge-MT prove can be reduced to
 * small-MT prove
-* lookup issue.
+* find the MT for group member
 
-we will find that, this kind of reduce will provide scalable group membership, and many following benefits, and on the other side, privacy decrease， which is acceptable in practicial case.
+and get many benefits :
+1. elastic group : could be enlarge/downsize according to demands.
+2. inifinte group
+3. smaller/constant merkle proof circuit, faster prover.
+4. lightweight/reusable trust setup for zkey (TODO : data, depth-20 need 2 hours on macbook pro). very big zkey file, become experience if user have to download for proof generate local.
+5. onchain gas cost ??
+6. reduce concurrency competition when multi user join the single group
+    (1) reorder tx by relay, not native
 
 
 ## Definitions
@@ -46,30 +51,6 @@ we will find that, this kind of reduce will provide scalable group membership, a
 * EG : Elastic Group, whose size dynamic growth.
 
 ## Specification
-
-We Propose Merkle Forest, using sharding of multi smaller group, instead of single huge group.
-    1. decouple the circuit size from Gurantee.
-    2. Group Size = 2^Gurantee = 2^H * 2^(G - H) = 2^H * K, K = 2^(G-H)
-
-also some other advantage:
-1. heavy trust setup for zkey (TODO : data, depth-20 need 2 hours on macbook pro). very big zkey file, become experience if user have to download for proof generate local.
-2. inifinte group
-3. build circuit themself.
-
-more important is , Merkle tree itself not scalable, there is no way to enlarge exist group(new circuit for new MT),  such as infinite group demands.
-
-ZK using merkle path to prove the group membership, so the circuit size is related(linear) to Group Gurantee. 
-
-Server issues exist for the single MT Group:
-* prover cost 
-* 2. prover time growth (linear??) with Gurantee.
-* 3. onchain gas cost increase(linearly) for group operation(insert..)
-* 4. concurrency competition issue when multi user join the single group
-    (1) reorder tx by relay, not native
-
-decouple , only 1 trust setup, scalable.
-
-
 
 ```mermaid
     flowchart LR;
