@@ -39,7 +39,7 @@ With the new elastic group design. the original huge [Merkle tree membership cir
 
 The Merkle forest described above will follow a left-to-right sequencial insertion of new members. To prevent the (total) loss of privacy the first member of a Merkle tree experiences until there are more members there as well, we propose the following design: the last Merkle tree in the forest will always have double size (so guarantee $+1$ w.r.t. the others). When this tree is full, we will fork it: the left side will be now a normally sized Merkle tree in the forest, while the right side will be joined by the new empty Merkle tree.
 
-![](https://imgur.com/a/HuwU8Yy)
+![](https://i.imgur.com/eApDxnY.png)
 
 In the picture above, we see what happens when we insert the group member $L6$ to the Merkle forest, filling the last tree. The last tree is forked, the left side becoming a Merkle tree with guarantee 2 and the right side joining a new empty Merkle tree. Before the insertion, the lookup table of roots consisted of $R1$ and $R$ (but not $R2$ nor $R3$). After the insertion, the lookup table consists of $R1$, $R2$ and $R'$ (but not $R3$ not $R4$).
 
