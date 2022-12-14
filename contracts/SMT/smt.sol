@@ -16,7 +16,7 @@ struct EAS {
 contract smt {
     using IncrementalBinaryTree for IncrementalTreeData;
 
-    event GroupCreated(uint256 indexed groupId, uint256 merkleTreeDepth, uint256 gurantee);
+    event GroupCreated(uint256 indexed groupId, uint256 gurantee, uint256 size);
     
     mapping(uint256 => EAS) eas;
 
@@ -33,17 +33,17 @@ contract smt {
     }
 
     function createGroup(
-        uint tree_depth,
-        uint gurantee,
-        uint256 zeroValue
+        uint gurantee,      // privacy level
+        uint size,          // group size
+        uint zeroValue
     ) public returns(uint) {
         GROUP_ID ++;
-        eas[GROUP_ID].H = tree_depth;
-        eas[GROUP_ID].K = gurantee - tree_depth;
+        eas[GROUP_ID].H = gurantee;
+        eas[GROUP_ID].K = size - gurantee;
         eas[GROUP_ID].zeroValue = zeroValue;
         eas[GROUP_ID].treeNum = 0;
         _createTree(GROUP_ID);
-        emit GroupCreated(GROUP_ID, tree_depth, gurantee);
+        emit GroupCreated(GROUP_ID, gurantee, size);
         return GROUP_ID;
     }
 
@@ -90,17 +90,17 @@ contract smt {
 
     function enlargeGroup(
         uint groupId,
-        uint gurantee
+        uint size
     ) public {  // TODO : admin only
-        eas[groupId].K = gurantee - eas[groupId].H;
+        eas[groupId].K = size - eas[groupId].H;
     }
 
     function downsizeGroup(
         uint groupId,
-        uint gurantee
+        uint size
     ) public {  // TODO : admin only
-        require(eas[groupId].treeNum <= 2 ** (gurantee - eas[groupId].H));
-        eas[groupId].K = gurantee - eas[groupId].H;
+        require(eas[groupId].treeNum <= 2 ** (size - eas[groupId].H));
+        eas[groupId].K = size - eas[groupId].H;
     }
 
 

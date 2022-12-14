@@ -121,8 +121,8 @@ decouple , only 1 trust setup, scalable.
 
 ```shell
     function createGroup(
-        uint tree_depth,
         uint gurantee,
+        uint size,
         uint zeroValue)
 ```
 
@@ -190,8 +190,8 @@ cost reduce
 Elastic Group
 
 ```shell
-    function enlargeGroup(uint groupId, uint gurantee)
-    function downsizeGroup(uint groupId, uint gurantee)
+    function enlargeGroup(uint groupId, uint size)
+    function downsizeGroup(uint groupId, uint size)
 ```
 
 increase/decrese group gurantee, group admin operation.
