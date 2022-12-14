@@ -33,7 +33,7 @@ Another issue with the single Merkle tree model employed in the Semaphore protoc
 ## The solution: Merkle forest
 We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$ has the same meaning as in the single Merkle tree case, i.e., a group member will have an exposure probability of $1/2^g$. The new parameter $n$ is the number of trees in the forest, so in this case the max group size is $n*2^g$.
 
-With the new elastic group design. the original huge Merkle tree membership circuit can be reduced to
+With the new elastic group design. the original huge [Merkle tree membership circuit](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/tree.circom) can be reduced to
 * a smaller Merkle tree membership circuit, which outputs a root
 * find the output root in a look-up table
 
@@ -48,7 +48,7 @@ With the new elastic group design. the original huge Merkle tree membership circ
 
 ### Semaphore Compatible
 
-"Merkle Forest" is based on Merkle tree prove, which means no circuit changes are needed, the existig Semaphore circuit and corresponding sdk still work.
+"Merkle Forest" is based on the Merkle tree membership circuit, which means no circuit changes are needed, the existing Semaphore circuit and corresponding sdk still work.
 
 An onchain lookup table is introduced to map members to the corresponding Merkle tree.
 
@@ -104,9 +104,7 @@ An onchain lookup table is introduced to map members to the corresponding Merkle
         uint zeroValue)
 ```
 
-Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^10 = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^10*4 = 4096$ leaves.
-
-if user don't give gurantee, infinite 
+Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^{10} = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^{10}*4 = 4096$ leaves.
 
 dynamic growth
 
@@ -155,7 +153,6 @@ cost reduce
         uint8[] calldata proofPathIndices)
 ```
 
-
 * Privacy Leave
 * Public Leave
 
@@ -168,13 +165,13 @@ Elastic Group
     function downsizeGroup(uint groupId, uint size)
 ```
 
-increase/decrese group gurantee, group admin operation.
-decrese only success if group's member number not exceed the new gurantee.
+Increase/decrease group guarantee, group admin operation.
+Decrease only succeeds if the group's member number does not exceed the new size.
 
 
-### migrate exist group
+### Migrate existing group
 
-exist group as 1 MT of the MT Forest.
+Migrate existing group as 1 MT of the MT Forest.
 
 problem is 
 
