@@ -1,6 +1,3 @@
-[TOC]
-
-
 # Merkle Forest : A zk-friendly Elastic Group Design
 
 ## Abstract
@@ -93,10 +90,6 @@ and get many benefits :
         single-MT -.-> Merkle-Forest
 
 ```
-
-
-
-## Interface
 
 ### Create Group  
 
