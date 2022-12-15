@@ -112,11 +112,7 @@ An onchain lookup table is introduced to map members to the corresponding Merkle
 
 Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^{10} = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^{10}*4 = 4096$ leaves.
 
-dynamic growth
-
-underline
-* increamental MT 
-* sparse MT
+We now using [incremenal merkle tree](https://github.com/privacy-scaling-explorations/zk-kit/tree/main/packages/incremental-merkle-tree) so as to fully compatible with semaphore.
 
 ### Join Group
 
@@ -126,9 +122,6 @@ underline
         uint256 identity)
 ```
 
-Group Growth Strategy
-* Dynamic Growth
-
 As the analysis before, in case the member expose when merkle tree is almost empty, we using a double-split strategy. the last tree will only be full when reach double grantee limit, and split into 2 full grantee tree.
 
 The problem is when split happens, will have to update lookup table for all the tree leafs, which may be limited by the blockchain gas limit.
@@ -137,10 +130,6 @@ For Ethereum, 1 tx gas limit could be 10000000, each uint256 storage cost 20000 
 log(500 * 256 / T). Let's say T = 16, support up to 2^16 group, with depth 12. if T = 8, supprt up to 2^8 group, with depth 13.
 
 maxium group size = (2^T) * (500 * 256 / T),  also need consider gurantee request.
-
-* Sequencial
-* Random
-    Hashed :  less shard expose , auto reorgnize.  re-blance. (tree split, no 2 different group)
 
 ### Membership Prove
 
@@ -152,11 +141,7 @@ maxium group size = (2^T) * (500 * 256 / T),  also need consider gurantee reques
         uint8[] calldata proofPathIndices)
 ```
 
-cost reduce
-* prover cost
-* gas cost
-
-
+The membership prove interface is exactly the same with semaphore's, while with smaller merkle proof and faster prover time.
 
 ### Leave Group(optional)
 
@@ -168,8 +153,7 @@ cost reduce
         uint8[] calldata proofPathIndices)
 ```
 
-* Privacy Leave
-* Public Leave
+Leave Group is exactly the same with semaphore's.
 
 ### Group Gurantee Change
 
