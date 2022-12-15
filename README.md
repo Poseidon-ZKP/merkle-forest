@@ -129,6 +129,15 @@ underline
 Group Growth Strategy
 * Dynamic Growth
 
+As the analysis before, in case the member expose when merkle tree is almost empty, we using a double-split strategy. the last tree will only be full when reach double grantee limit, and split into 2 full grantee tree.
+
+The problem is when split happens, will have to update lookup table for all the tree leafs, which may be limited by the blockchain gas limit.
+
+For Ethereum, 1 tx gas limit could be 10000000, each uint256 storage cost 20000 gas, max support 500 uint256 update. suppose we using T bit for tree index, the maxium leaf will be 500 * 256 / T, the maxium tree depth could be
+log(500 * 256 / T). Let's say T = 16, support up to 2^16 group, with depth 12. if T = 8, supprt up to 2^8 group, with depth 13.
+
+maxium group size = (2^T) * (500 * 256 / T),  also need consider gurantee request.
+
 * Sequencial
 * Random
     Hashed :  less shard expose , auto reorgnize.  re-blance. (tree split, no 2 different group)
@@ -179,9 +188,7 @@ Decrease only succeeds if the group's member number does not exceed the new max 
 
 Migrate existing group as 1 MT of the MT Forest.
 
-problem is 
-
-gas limit
+the problem is "migrate on chain may exceed blockchain gas limit"
 
 ### Composable/CP-Snark(optional)
 
