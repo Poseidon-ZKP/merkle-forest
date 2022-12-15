@@ -189,6 +189,7 @@ Decrease only succeeds if the group's member number does not exceed the new max 
 Migrate existing group as 1 MT of the MT Forest.
 
 the problem is "migrate on chain may exceed blockchain gas limit"
+also have the similar "gas limit" as analysis "insert group"
 
 ### Composable/CP-Snark(optional)
 

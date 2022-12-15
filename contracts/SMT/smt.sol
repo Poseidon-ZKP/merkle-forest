@@ -7,10 +7,10 @@ struct EAS {
     uint H;
     uint K;
     mapping(uint256 => IncrementalTreeData) merkleTree;
-    uint treeNum;
+    uint16 treeNum;
     uint256 zeroValue;
     // TODO :  mapping too big?  map[A] = X, map[B] = X <--> map[A op B] = X ?
-    mapping(uint256 => uint256) member2tree;
+    mapping(uint256 => uint16) member2tree;
 }
 
 contract smt {
@@ -41,7 +41,7 @@ contract smt {
         eas[GROUP_ID].H = gurantee;
         eas[GROUP_ID].K = size - gurantee;
         eas[GROUP_ID].zeroValue = zeroValue;
-        eas[GROUP_ID].treeNum = 2**256 - 1;
+        eas[GROUP_ID].treeNum = 2**16 - 1;
         _createTree(GROUP_ID);
         emit GroupCreated(GROUP_ID, gurantee, size);
         return GROUP_ID;
@@ -51,15 +51,17 @@ contract smt {
         uint256 groupId,
         uint256 identity
     ) public {
+        bool FORK_GRANTEE = false;      // TODO : enable
+
         // decide which tree to join, or new tree, split tree
         // growth strategy : L->R + Split Group
         //              TODO : random insert
-        if (eas[groupId].merkleTree[eas[groupId].treeNum].numberOfLeaves >= 2**(eas[groupId].H)) {
+        if (eas[groupId].merkleTree[eas[groupId].treeNum].numberOfLeaves >= 2**(eas[groupId].H) * (FORK_GRANTEE ? 2 : 1)) {
             _createTree(GROUP_ID);
         }
 
         // insert to current tree
-        uint treeId = eas[groupId].treeNum;
+        uint16 treeId = eas[groupId].treeNum;
         eas[groupId].merkleTree[treeId].insert(identity);
         eas[groupId].member2tree[identity] = treeId;
     }
