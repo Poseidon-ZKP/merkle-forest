@@ -124,6 +124,8 @@ We now using [incremenal merkle tree](https://github.com/privacy-scaling-explora
 
 As the analysis before, in case the member expose when merkle tree is almost empty, we using a double-split strategy. the last tree will only be full when reach double grantee limit, and split into 2 full grantee tree.
 
+since the last tree is double grantee.
+
 ### Membership Prove
 
 ```shell
@@ -170,7 +172,16 @@ Migrate existing group as 1 MT of the MT Forest.
 CP-SNARK and -> or ? 
 
 
- ## [Reference Implementation](./contracts/SMT/smt.sol)
+## [Profile]
+
+
+|Merkle Tree Depth|pk size|prove time|
+|  ----  | ----  | ----  |
+|10|||
+|16|||
+|32|||
+
+## [Reference Implementation](./contracts/SMT/smt.sol)
 
 Fully compatible with Semaphore Interface, minor changes for implement eas.
 
