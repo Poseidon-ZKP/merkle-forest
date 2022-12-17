@@ -172,7 +172,7 @@ Migrate existing group as 1 MT of the MT Forest.
 CP-SNARK and -> or ? 
 
 
-## [Profile]
+## Profile
 
 
 |Merkle Tree Depth|pk size|prove time|
