@@ -112,11 +112,7 @@ An onchain lookup table is introduced to map members to the corresponding Merkle
 
 Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^{10} = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^{10}*4 = 4096$ leaves.
 
-dynamic growth
-
-underline
-* increamental MT 
-* sparse MT
+We now using [incremenal merkle tree](https://github.com/privacy-scaling-explorations/zk-kit/tree/main/packages/incremental-merkle-tree) so as to fully compatible with semaphore.
 
 ### Join Group
 
@@ -126,12 +122,9 @@ underline
         uint256 identity)
 ```
 
-Group Growth Strategy
-* Dynamic Growth
+As the analysis before, in case the member expose when merkle tree is almost empty, we using a double-split strategy. the last tree will only be full when reach double grantee limit, and split into 2 full grantee tree.
 
-* Sequencial
-* Random
-    Hashed :  less shard expose , auto reorgnize.  re-blance. (tree split, no 2 different group)
+since the last tree is double grantee.
 
 ### Membership Prove
 
@@ -143,11 +136,7 @@ Group Growth Strategy
         uint8[] calldata proofPathIndices)
 ```
 
-cost reduce
-* prover cost
-* gas cost
-
-
+The membership prove interface is exactly the same with semaphore's, while with smaller merkle proof and faster prover time.
 
 ### Leave Group(optional)
 
@@ -159,8 +148,7 @@ cost reduce
         uint8[] calldata proofPathIndices)
 ```
 
-* Privacy Leave
-* Public Leave
+Leave Group is exactly the same with semaphore's.
 
 ### Group Gurantee Change
 
@@ -179,16 +167,21 @@ Decrease only succeeds if the group's member number does not exceed the new max 
 
 Migrate existing group as 1 MT of the MT Forest.
 
-problem is 
-
-gas limit
-
 ### Composable/CP-Snark(optional)
 
 CP-SNARK and -> or ? 
 
 
- ## [Reference Implementation](./contracts/SMT/smt.sol)
+## Profile
+
+
+|Merkle Tree Depth|pk size|prove time|
+|  ----  | ----  | ----  |
+|10|||
+|16|||
+|32|||
+
+## [Reference Implementation](./contracts/SMT/smt.sol)
 
 Fully compatible with Semaphore Interface, minor changes for implement eas.
 
