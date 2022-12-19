@@ -112,7 +112,7 @@ An onchain lookup table is introduced to map members to the corresponding Merkle
 
 Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^{10} = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^{10}*4 = 4096$ leaves.
 
-We now using [incremenal merkle tree](https://github.com/privacy-scaling-explorations/zk-kit/tree/main/packages/incremental-merkle-tree) so as to fully compatible with semaphore.
+We use an [incremental Merkle tree](https://github.com/privacy-scaling-explorations/zk-kit/tree/main/packages/incremental-merkle-tree) which is fully compatible with Semaphore.
 
 ### Join Group
 
@@ -122,11 +122,9 @@ We now using [incremenal merkle tree](https://github.com/privacy-scaling-explora
         uint256 identity)
 ```
 
-As the analysis before, in case the member expose when merkle tree is almost empty, we using a double-split strategy. the last tree will only be full when reach double grantee limit, and split into 2 full grantee tree.
+As explained in the analysis above, to prevent member exposure when their Merkle tree is almost empty, we use a double-split strategy. The last tree will only be full when it reaches a double guarantee limit, and then split into 2 full guarantee trees. The right tree after the splitting will be attached on the right to an empty Merkle tree, thus becoming the new double size Merkle tree in the forest.
 
-since the last tree is double grantee.
-
-### Membership Prove
+### Membership Proof
 
 ```shell
     function contains(
@@ -136,9 +134,9 @@ since the last tree is double grantee.
         uint8[] calldata proofPathIndices)
 ```
 
-The membership prove interface is exactly the same with semaphore's, while with smaller merkle proof and faster prover time.
+The membership proof interface is exactly the same as Semaphore's, but with smaller Merkle proofs and faster prover time.
 
-### Leave Group(optional)
+### Leave Group (optional)
 
 ```shell
     function remove(
@@ -148,9 +146,9 @@ The membership prove interface is exactly the same with semaphore's, while with 
         uint8[] calldata proofPathIndices)
 ```
 
-Leave Group is exactly the same with semaphore's.
+Leave Group is exactly the same as Semaphore's.
 
-### Group Gurantee Change
+### Group Guarantee Change
 
 Elastic Group
 
@@ -184,4 +182,3 @@ CP-SNARK and -> or ?
 ## [Reference Implementation](./contracts/SMT/smt.sol)
 
 Fully compatible with Semaphore Interface, minor changes for implement eas.
-
