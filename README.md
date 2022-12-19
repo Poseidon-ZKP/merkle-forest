@@ -172,12 +172,15 @@ CP-SNARK and -> or ?
 
 ## Profile
 
+benchmark for different depth semaphore group with macbook pro(intel) 2019
+show that, circuit constraints growth linearly, so as to pk size and prove time.
+while trust setup time/ptau size growth Exponentially, which will benefit more from elastic group design.
 
-|Merkle Tree Depth|pk size|prove time|
-|  ----  | ----  | ----  |
-|10|||
-|16|||
-|32|||
+|Merkle Tree Depth|trust setup time |ptau size|constraints| pk size|prove time|
+|  ----  | ----  | ----  | ----  | ----  | ----  |
+|16|10 min|72M|9K|2.8M|5.5s|
+|20|160 min|1.1G|12K|3.3M|6.5s|
+|32|unfinished||18K|5.2M||
 
 ## [Reference Implementation](./contracts/SMT/smt.sol)
 
