@@ -1,39 +1,64 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity >= 0.8.0;
 
+import {PoseidonT3} from "@zk-kit/incremental-merkle-tree.sol/Hashes.sol";
 import "@zk-kit/incremental-merkle-tree.sol/IncrementalBinaryTree.sol";
 
 struct EG {
     uint gurantee;
     uint maxTreeNum;
-    mapping(uint256 => IncrementalTreeData) merkleTree;
-    uint16 treeNum;
-    uint256 zeroValue;
-    mapping(uint256 => uint16) member2index;
+    mapping(uint => IncrementalTreeData) merkleTree;
+    uint treeNum;
+    uint zeroValue;
+    mapping(uint => uint) member2tree;
 }
 
-contract smt {
+interface IVerifier {
+    function verifyProof(
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[1] memory input
+    ) external view;
+}
+
+contract elasticGroup {
     using IncrementalBinaryTree for IncrementalTreeData;
 
-    event GroupCreated(uint256 indexed groupId, uint256 gurantee, uint256 maxTreeNum);
-    
-    mapping(uint256 => EG) eg;
-
+    event GroupCreated(uint indexed groupId, uint gurantee, uint maxTreeNum);
+    mapping(uint => EG) eg;
     uint public GROUP_ID;
+    mapping(uint => IVerifier) internal verifiers;
 
-    function _createTree(
-        uint256 groupId
+    struct Verifier {
+        address contractAddress;
+        uint merkleTreeDepth;
+    }
+    constructor(Verifier[] memory _verifiers) {
+        for (uint8 i = 0; i < _verifiers.length; ) {
+            verifiers[_verifiers[i].merkleTreeDepth] = IVerifier(_verifiers[i].contractAddress);
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+
+    function createTree(
+        uint groupId
     ) internal virtual {
         require(eg[groupId].treeNum < eg[groupId].maxTreeNum, "Group Full!!");
-        uint merkleTreeDepth = eg[groupId].gurantee;
-        uint zeroValue = eg[groupId].zeroValue;
-        eg[groupId].merkleTree[eg[GROUP_ID].treeNum + 1].init(merkleTreeDepth, zeroValue);
+        eg[groupId].merkleTree[eg[GROUP_ID].treeNum + 1].init(
+            eg[groupId].gurantee,
+            eg[groupId].zeroValue
+        );
         eg[groupId].treeNum++;
     }
 
     function createGroup(
-        uint gurantee,      // privacy level
-        uint maxTreeNum,          // group size
+        uint gurantee,
+        uint maxTreeNum,
         uint zeroValue
     ) public returns(uint) {
         GROUP_ID ++;
@@ -41,62 +66,76 @@ contract smt {
         eg[GROUP_ID].maxTreeNum = maxTreeNum;
         eg[GROUP_ID].zeroValue = zeroValue;
         eg[GROUP_ID].treeNum = 0;
-        _createTree(GROUP_ID);
+        createTree(GROUP_ID);
         emit GroupCreated(GROUP_ID, gurantee, maxTreeNum);
         return GROUP_ID;
     }
 
     function insert(
-        uint256 groupId,
-        uint256 identity
+        uint groupId,
+        uint identity
     ) public {
-
-
-        // insert to current tree
-        uint16 treeId = eg[groupId].treeNum;
-        eg[groupId].merkleTree[treeId].insert(identity);
-        uint index = treeId * (2 ** eg[groupId].gurantee) + eg[groupId].merkleTree[treeId].numberOfLeaves + 1;
-        eg[groupId].member2index[identity] = index;
-
-        // if tree full
-        if (index % (2 ** eg[groupId].gurantee) == 0) {
-            // left subtree as seprate merkle tree
-            IncrementalTreeData memory left_tree = IncrementalTreeData({
-                depth : eg[groupId].gurantee,
-                root : eg[groupId].merkleTree[treeId].lastSubtrees[eg[groupId].merkleTree[treeId].root],
-                numberOfLeaves : 2 ** eg[groupId].gurantee,
-                zeroes : eg[groupId].merkleTree[treeId].zeroes,
-                lastSubtrees : eg[groupId].merkleTree[treeId].lastSubtrees
-            });
-
-            eg[groupId].merkleTree[treeId] = left_tree;
-
-            // create new tree
-            _createTree(GROUP_ID);
-
-            // TODO :  right subtree combin with a new tree to be last tree
-
+        if (eg[groupId].merkleTree[eg[groupId].treeNum].numberOfLeaves == 2 ** eg[groupId].gurantee) {
+            // current tree full, create new tree
+            createTree(groupId);
         }
 
+        uint treeId = eg[groupId].treeNum;
+        eg[groupId].merkleTree[treeId].insert(identity);
+        eg[groupId].member2tree[identity] = treeId;
     }
 
-    // TODO : IBT verify is private, so using remove for check contains
+    // TODO : IBT verify is private function, so using remove for check contains
     // check identity in the tree. (if last tree, gurantee double proof?)
     function contains(
-        uint256 groupId,
-        uint256 identity,
-        uint256[] calldata proofSiblings,
+        uint groupId,
+        uint identity,
+        uint[] calldata proofSiblings,
         uint8[] calldata proofPathIndices
     ) public {
-        uint index = eg[groupId].member2index[identity];
-        require(index != 0, "not in group!!");
+        uint treeId = eg[groupId].member2tree[identity];
+        require(treeId != 0, "not in group!!");
         //eg[groupId].merkleTree[treeId].verify(identity, proofSiblings, proofPathIndices);
     }
 
+    // prove membership by combile merkle trees, provide elastic gurantee
+    function verifyProof(
+        uint groupId,
+        uint[] calldata treeIds,
+        uint[8] calldata proof
+    ) external view returns (bool) {
+        uint merkleTreeDepth;
+        uint merkleTreeRoot;
+
+        if (treeIds.length == 1) {
+            merkleTreeDepth = eg[groupId].gurantee;
+            merkleTreeRoot = eg[groupId].merkleTree[treeIds[0]].root;
+        } else if (treeIds.length == 2) {
+            merkleTreeDepth = eg[groupId].gurantee + 1;
+
+            merkleTreeRoot = PoseidonT3.poseidon([
+                eg[groupId].merkleTree[treeIds[0]].root, 
+                eg[groupId].merkleTree[treeIds[1]].root 
+            ]);
+        } else {
+            // TODO :  merge more trees to provide higher gurantee.
+        }
+
+
+        IVerifier verifier = verifiers[merkleTreeDepth];
+        verifier.verifyProof(
+            [proof[0], proof[1]],
+            [[proof[2], proof[3]], [proof[4], proof[5]]],
+            [proof[6], proof[7]],
+            [merkleTreeRoot]
+        );
+        return true;
+    }
+
     function remove(
-        uint256 groupId,
-        uint256 identity,
-        uint256[] calldata proofSiblings,
+        uint groupId,
+        uint identity,
+        uint[] calldata proofSiblings,
         uint8[] calldata proofPathIndices
     ) public {
         uint treeId = eg[groupId].member2tree[identity];
@@ -105,21 +144,20 @@ contract smt {
         delete eg[groupId].member2tree[identity];
     }
 
-    function enlargeGroup(
+    function enlarge(
         uint groupId,
         uint size
-    ) public {  // TODO : admin only
+    ) public {
         eg[groupId].maxTreeNum = size - eg[groupId].gurantee;
     }
 
-    function downsizeGroup(
+    function downsize(
         uint groupId,
-        uint size
-    ) public {  // TODO : admin only
-        require(eg[groupId].treeNum <= 2 ** (size - eg[groupId].gurantee));
-        eg[groupId].maxTreeNum = size - eg[groupId].gurantee;
+        uint maxTreeNum
+    ) public {
+        require(eg[groupId].treeNum < maxTreeNum);
+        eg[groupId].maxTreeNum = maxTreeNum;
     }
-
 
     function migrate(
         IncrementalTreeData storage merkleTree,
