@@ -31,52 +31,9 @@ Another issue with the single Merkle tree model employed in the Semaphore protoc
 ## The solution: Merkle forest
 We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$ has the same meaning as in the single Merkle tree case, i.e., a group member will have an exposure probability of $1/2^g$. The new parameter $n$ is the number of trees in the forest, so in this case the max group size is $n*2^g$.
 
-With the new elastic group design. the original huge [Merkle tree membership circuit](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/tree.circom) can be reduced to
-* a smaller Merkle tree membership circuit, which outputs a root
-* find the output root in a look-up table
-
-this actually provide "elastic gurantee", suppose the follow cases:
-1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
-2. user join a tree which have less leaves, which means it might loss privacy, then user could just "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree.
-3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want.
-
-TODO : pic for "merge" tree.
-
-The "merge" demands varies between different user case, suppose two kinds of privacy vote case
-1. privacy vote only after all user have joined and group freezed.
-2. privacy vote happens simultanously as new member join the group.
-
-In the 2nd user case, concurrency competion could happen. for example, when user A vote and user B join the same group at the same time, and the join 1st complete modify merkle tree on-chain, while vote still using old merkle path, result in on-chain verify fail. It could possible be resolved by centralized cordinator, like relayer, in some specific user cases， but not all user case. A native methology is required for reduce concurency competion.
-
-So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition.
-
-TODO : pic "hash-based random member join".
-
-
-The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case. 
-
-TODO : pic "sequential member join".
-
-
-## Advantages
-1. Elastic group : could be enlarged/downsized according to demands.
-2. Possibly infinite group.
-2. accurate fine-grained group size.
-3. Smaller Merkle proof circuits, faster prover.
-4. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a Macbook Pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
-5. Reduced concurrency competition when several users join a single group.
-
-## Specification
-
-### Semaphore Compatible
-
-"Merkle Forest" is based on the Merkle tree membership circuit, which means no circuit changes are needed, the existing Semaphore circuit and corresponding sdk still work.
-
-An onchain lookup table is introduced to map members to the corresponding Merkle tree.
-
-
 ```mermaid
     flowchart LR;
+        title[<u>Figure 1. Merkle Forest</u>]
         style single-MT fill:#FBFCFC
         style Merkle-Forest fill:#FBFCFC
         style Lookup-Table fill:#FBFCFC
@@ -116,6 +73,98 @@ An onchain lookup table is introduced to map members to the corresponding Merkle
         single-MT -.-> Merkle-Forest
 
 ```
+
+With the new elastic group design. the original huge [Merkle tree membership circuit](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/tree.circom) can be reduced to
+* a smaller Merkle tree membership circuit, which outputs a root
+* find the output root in a look-up table
+
+this actually provide "elastic gurantee", suppose the follow cases:
+1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
+2. user join a tree which have less leaves, which means it might loss privacy, then user could just "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree.
+3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want. Figure 2 given an example of merge 4 trees in group.
+
+```mermaid
+    flowchart LR;
+        title[<u>Figure 2. Merge Tree </u>]
+        style Merkle-Forest fill:#FBFCFC
+        style Lookup-Table fill:#FBFCFC
+        style MT1 fill:#FBFCFC
+        style MT2 fill:#FBFCFC
+        style MT3 fill:#FBFCFC
+        style MT4 fill:#FBFCFC
+
+        subgraph Merkle-Forest
+            subgraph Lookup-Table
+                LT1(1)
+                LT2(2)
+                LT3(3)
+                LT4(4)
+                LT5(5)
+                LT6(6)
+                LT7(7)
+                LT8(8)
+            end
+            LT2 & LT5 -.-> R1;
+            LT1 & LT3 & LT7 -.-> R2;
+            LT4 -.-> R3;
+            LT2 & LT6 -.-> R4;
+
+            subgraph MT1
+                R1 --> C1L & C1R;
+                C1L-->1LL(2) & 1LR(5)
+                C1R-->1RL(ZERO) & 1RR(ZERO)
+            end
+
+            subgraph MT2
+                R2 --> C2L & C2R;
+                C2L-->2LL(1) & 2LR(3)
+                C2R-->2RL(7) & 2RR(ZERO)
+            end
+
+            subgraph MT3
+                R3 --> C3L & C3R;
+                C3L-->3LL(4) & 3LR(ZERO)
+                C3R-->3RL(ZERO) & 3RR(ZERO)
+            end
+
+            subgraph MT4
+                R4 --> C4L & C4R;
+                C4L-->4LL(2) & 4LR(6)
+                C4R-->4RL(ZERO) & 4RR(ZERO)
+            end
+
+        end
+
+```
+
+
+The "merge" demands varies between different user case, suppose two kinds of privacy vote case
+1. privacy vote only after all user have joined and group freezed.
+2. privacy vote happens simultanously as new member join the group.
+
+In the 2nd user case, concurrency competion could happen. for example, when user A vote and user B join the same group at the same time, and the join 1st complete modify merkle tree on-chain, while vote still using old merkle path, result in on-chain verify fail. It could possible be resolved by centralized cordinator, like relayer, in some specific user cases， but not all user case. A native methology is required for reduce concurency competion.
+
+So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition. Figure 2 given an example of how 
+
+The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
+
+## Advantages
+1. Elastic group : could be enlarged/downsized according to demands.
+2. Possibly infinite group.
+2. accurate fine-grained group size.
+3. Smaller Merkle proof circuits, faster prover.
+4. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a Macbook Pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
+5. Reduced concurrency competition when several users join a single group.
+
+## Specification
+
+### Semaphore Compatible
+
+"Merkle Forest" is based on the Merkle tree membership circuit, which means no circuit changes are needed, the existing Semaphore circuit and corresponding sdk still work.
+
+An onchain lookup table is introduced to map members to the corresponding Merkle tree.
+
+
 
 ### Create Elastic Group  
 

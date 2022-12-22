@@ -4,10 +4,16 @@ pragma solidity >= 0.8.0;
 import {PoseidonT3} from "@zk-kit/incremental-merkle-tree.sol/Hashes.sol";
 import "@zk-kit/incremental-merkle-tree.sol/IncrementalBinaryTree.sol";
 
+enum JOIN_STRATEGY {
+    SEQUENTIAL,
+    RANDOM
+}
+
 struct EG {
     uint gurantee;
     uint maxTreeNum;
     mapping(uint => IncrementalTreeData) merkleTree;
+    JOIN_STRATEGY strategy;
     uint treeNum;
     uint zeroValue;
     mapping(uint => uint) member2tree;
@@ -59,13 +65,15 @@ contract elasticGroup {
     function createGroup(
         uint gurantee,
         uint maxTreeNum,
-        uint zeroValue
+        uint zeroValue,
+        JOIN_STRATEGY strategy
     ) public returns(uint) {
         GROUP_ID ++;
         eg[GROUP_ID].gurantee = gurantee;
         eg[GROUP_ID].maxTreeNum = maxTreeNum;
         eg[GROUP_ID].zeroValue = zeroValue;
         eg[GROUP_ID].treeNum = 0;
+        eg[GROUP_ID].strategy = strategy;
         createTree(GROUP_ID);
         emit GroupCreated(GROUP_ID, gurantee, maxTreeNum);
         return GROUP_ID;
@@ -75,6 +83,8 @@ contract elasticGroup {
         uint groupId,
         uint identity
     ) public {
+        require(eg[groupId].strategy == JOIN_STRATEGY.SEQUENTIAL, "only support seqential join now!!!");
+
         if (eg[groupId].merkleTree[eg[groupId].treeNum].numberOfLeaves == 2 ** eg[groupId].gurantee) {
             // current tree full, create new tree
             createTree(groupId);
