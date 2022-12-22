@@ -80,34 +80,24 @@ With the new elastic group design. the original huge [Merkle tree membership cir
 
 this actually provide "elastic gurantee", suppose the follow cases:
 1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
-2. user join a tree which have less leaves, which means it might loss privacy, then user could just "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree.
+2. user join a tree which have less leaves, which means it might loss privacy, then user could just "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree. As an example in Figure 2, if member 4 want to prove membership with privacy grantee 2, then it can merge serveal trees to make the total members is more than 2**2 in new tree, here merge tree 2 and 3, and provide the merkle proof of new tree.  
 3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want. Figure 2 given an example of merge 4 trees in group.
 
 ```mermaid
     flowchart LR;
         title[<u>Figure 2. Merge Tree </u>]
         style Merkle-Forest fill:#FBFCFC
-        style Lookup-Table fill:#FBFCFC
+        style Merge fill:#FBFCFC
         style MT1 fill:#FBFCFC
         style MT2 fill:#FBFCFC
         style MT3 fill:#FBFCFC
         style MT4 fill:#FBFCFC
 
         subgraph Merkle-Forest
-            subgraph Lookup-Table
-                LT1(1)
-                LT2(2)
-                LT3(3)
-                LT4(4)
-                LT5(5)
-                LT6(6)
-                LT7(7)
-                LT8(8)
+            subgraph Merge
+                ROOT
             end
-            LT2 & LT5 -.-> R1;
-            LT1 & LT3 & LT7 -.-> R2;
-            LT4 -.-> R3;
-            LT2 & LT6 -.-> R4;
+            ROOT -.-> R2 & R3;
 
             subgraph MT1
                 R1 --> C1L & C1R;
@@ -144,7 +134,7 @@ The "merge" demands varies between different user case, suppose two kinds of pri
 
 In the 2nd user case, concurrency competion could happen. for example, when user A vote and user B join the same group at the same time, and the join 1st complete modify merkle tree on-chain, while vote still using old merkle path, result in on-chain verify fail. It could possible be resolved by centralized cordinator, like relayer, in some specific user cases， but not all user case. A native methology is required for reduce concurency competion.
 
-So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition. Figure 2 given an example of how 
+So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition. Figure 2 show an example of random-memeber-join merkle forest.
 
 The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
 
