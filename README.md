@@ -136,7 +136,62 @@ The "merge" demands varies between different user case, suppose two kinds of pri
 
 In the 2nd user case, concurrency competion could happen. for example, when user A vote and user B join the same group at the same time, and the join 1st complete modify merkle tree on-chain, while vote still using old merkle path, result in on-chain verify fail. It could possible be resolved by centralized cordinator, like relayer, in some specific user cases， but not all user case. A native methology is required for reduce concurency competion.
 
-So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition. Figure 2 show an example of random-memeber-join merkle forest.
+So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition. Figure 3 show an example of random-memeber-join merkle forest.
+
+```mermaid
+    flowchart TD;
+        title[<u>Figure 2. Merge Tree </u>]
+        style Merkle-Forest fill:#FBFCFC
+        style Lookup-Table fill:#FBFCFC
+        style MT1 fill:#FBFCFC
+        style MT2 fill:#FBFCFC
+        style MT3 fill:#FBFCFC
+        style MT4 fill:#FBFCFC
+
+        subgraph Merkle-Forest
+
+            subgraph Lookup-Table
+                LT1(1)
+                LT2(2)
+                LT3(3)
+                LT4(4)
+                LT5(5)
+                LT6(6)
+                LT7(7)
+                LT8(8)
+            end
+                LT2 & LT5 -.-> R1;
+                LT1 & LT3 & LT7 -.-> R2;
+                LT4 -.-> R3;
+                LT2 & LT6 -.-> R4;
+
+            subgraph MT1
+                R1 --> C1L & C1R;
+                C1L-->1LL(2) & 1LR(5)
+                C1R-->1RL(ZERO) & 1RR(ZERO)
+            end
+
+            subgraph MT2
+                R2 --> C2L & C2R;
+                C2L-->2LL(1) & 2LR(3)
+                C2R-->2RL(7) & 2RR(ZERO)
+            end
+
+            subgraph MT3
+                R3 --> C3L & C3R;
+                C3L-->3LL(4) & 3LR(ZERO)
+                C3R-->3RL(ZERO) & 3RR(ZERO)
+            end
+
+            subgraph MT4
+                R4 --> C4L & C4R;
+                C4L-->4LL(2) & 4LR(6)
+                C4R-->4RL(ZERO) & 4RR(ZERO)
+            end
+
+        end
+```
+
 
 The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
 
