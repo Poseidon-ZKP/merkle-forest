@@ -1,7 +1,5 @@
 # Merkle Forest : ZK-friendly Elastic Group
 
-## Abstract
-
 ## Background
 [Semaphore](https://semaphore.appliedzkp.org/) is ZKP-powered protocol that allows users to:
 * Prove their membership of a group 
@@ -37,15 +35,33 @@ With the new elastic group design. the original huge [Merkle tree membership cir
 * a smaller Merkle tree membership circuit, which outputs a root
 * find the output root in a look-up table
 
-The Merkle forest described above will follow a left-to-right sequencial insertion of new members. To prevent the (total) loss of privacy the first member of a Merkle tree experiences until there are more members there as well, we propose the following design: the last Merkle tree in the forest will always have double size (so guarantee $+1$ w.r.t. the others). When this tree is full, we will split it: the left side will be now a normally sized Merkle tree in the forest, while the right side will be joined by the new empty Merkle tree.
+this actually provide "elastic gurantee", suppose the follow cases:
+1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
+2. user join a tree which have less leaves, which means it might loss privacy, then user could just "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree.
+3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want.
 
-![](https://i.imgur.com/eApDxnY.png)
+TODO : pic for "merge" tree.
 
-In the picture above, we see what happens when we insert the group member $L6$ to the Merkle forest, filling the last tree. The last tree is split, the left side becoming a Merkle tree with guarantee 2 and the right side joining a new empty Merkle tree. Before the insertion, the lookup table of roots consisted of $R1$ and $R$ (but not $R2$ nor $R3$). After the insertion, the lookup table consists of $R1$, $R2$ and $R'$ (but not $R3$ not $R4$).
+The "merge" demands varies between different user case, suppose two kinds of privacy vote case
+1. privacy vote only after all user have joined and group freezed.
+2. privacy vote happens simultanously as new member join the group.
+
+In the 2nd user case, concurrency competion could happen. for example, when user A vote and user B join the same group at the same time, and the join 1st complete modify merkle tree on-chain, while vote still using old merkle path, result in on-chain verify fail. It could possible be resolved by centralized cordinator, like relayer, in some specific user cases， but not all user case. A native methology is required for reduce concurency competion.
+
+So here, we proposal a hash-based random-member-join strategy, that is, select a random group to join, in this way, simulatanously prove and join activity will most probably operate on different group, thus almost avoid concurrency competition.
+
+TODO : pic "hash-based random member join".
+
+
+The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case. 
+
+TODO : pic "sequential member join".
+
 
 ## Advantages
 1. Elastic group : could be enlarged/downsized according to demands.
 2. Possibly infinite group.
+2. accurate fine-grained group size.
 3. Smaller Merkle proof circuits, faster prover.
 4. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a Macbook Pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
 5. Reduced concurrency competition when several users join a single group.
