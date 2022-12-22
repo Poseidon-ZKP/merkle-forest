@@ -84,7 +84,7 @@ this actually provide "elastic gurantee", suppose the follow cases:
 3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want. Figure 2 given an example of merge 4 trees in group.
 
 ```mermaid
-    flowchart LR;
+    flowchart TD;
         title[<u>Figure 2. Merge Tree </u>]
         style Merkle-Forest fill:#FBFCFC
         style Merge fill:#FBFCFC
@@ -94,10 +94,6 @@ this actually provide "elastic gurantee", suppose the follow cases:
         style MT4 fill:#FBFCFC
 
         subgraph Merkle-Forest
-            subgraph Merge
-                ROOT
-            end
-            ROOT -.-> R2 & R3;
 
             subgraph MT1
                 R1 --> C1L & C1R;
@@ -124,6 +120,12 @@ this actually provide "elastic gurantee", suppose the follow cases:
             end
 
         end
+
+        subgraph Merge
+            ROOT
+        end
+        ROOT -.-> R2 & R3;
+
 
 ```
 
