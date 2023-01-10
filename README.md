@@ -283,11 +283,11 @@ Decrease only succeeds if the group's member number does not exceed the new max 
 
 ### Migrate existing group
 
-Migrate existing group as 1 MT of the MT Forest.
+TODO : Migrate existing group as 1 MT of the MT Forest.
 
-### Composable/CP-Snark(optional)
+<!-- ### Composable/CP-Snark(optional)
 
-CP-SNARK and -> or ? 
+CP-SNARK and -> or ?  -->
 
 
 ## Profile
