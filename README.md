@@ -12,7 +12,7 @@ The first two private inputs, siblings and path indices, form a path in a Merkle
 ## Terminology
 * [identity](https://semaphore.appliedzkp.org/docs/guides/identities): a triple consisting of a trapdoor, a nullifier and a commitment. The commitment is computed from the trapdoor and nullifier and is inserted as a leaf in the groups it belongs to.
 * Group: In the Semaphore protocol, a Merkle tree. In our proposal, a Merkle forest. 
-* Privacy/anonimity guarantee: a security parameter, the higher it is the lower the probability a member can be exposed in a group. In the Semaphore protocol above, it is the depth of the Merkle tree. For a guarantee $g$, the Merkle tree can store $2^g$ leaves, so the minimum exposure probability, achieved when the group reaches its maximum capacity, is $1/2^g$.
+* Privacy Guarantee: a security parameter, the higher it is the lower the probability a member can be exposed in a group. In the Semaphore protocol above, it is the depth of the Merkle tree. For a guarantee $g$, the Merkle tree can store $2^g$ leaves, so the minimum exposure probability, achieved when the group reaches its maximum capacity, is $1/2^g$.
 * Max group size. Max number of members a group can host. In the Semaphore protocol, this is the number of leaves the Merkle tree can store.
 * EG: Elastic Group, whose size grows dynamically.
 
@@ -33,7 +33,7 @@ We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$
 
 ```mermaid
     flowchart LR;
-        title[<u>Figure 1. Merkle Forest</u>]
+        title[Figure 1. Merkle Forest]
         style single-MT fill:#FBFCFC
         style Merkle-Forest fill:#FBFCFC
         style Lookup-Table fill:#FBFCFC
@@ -80,7 +80,7 @@ With the new elastic group design. the original huge [Merkle tree membership cir
 
 this actually provide "elastic gurantee", suppose the follow cases:
 1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
-2. user join a tree which have less leaves, which means it might loss privacy, then user could just "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree. As an example in Figure 2, if member 4 want to prove membership with privacy grantee 2, then it can merge serveal trees to make the total members is more than 2**2 in new tree, here merge tree 2 and 3, and provide the merkle proof of new tree.  
+2. user join a tree which have less leaves, which means it might loss privacy, then user could "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree. As an example in Figure 2, if member 4 want to prove membership with privacy grantee 2, then it can merge serveal trees to make the total members is more than 2**2 in new tree, here merge tree 2 and 3, and provide the merkle proof of new tree.  
 3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want. Figure 2 given an example of merge 4 trees in group.
 
 ```mermaid
@@ -140,7 +140,7 @@ So here, we proposal a hash-based random-member-join strategy, that is, select a
 
 ```mermaid
     flowchart TD;
-        title[<u>Figure 2. Merge Tree </u>]
+        title[<u>Figure 3. Merge Tree </u>]
         style Merkle-Forest fill:#FBFCFC
         style Lookup-Table fill:#FBFCFC
         style MT1 fill:#FBFCFC
@@ -247,6 +247,14 @@ As explained in the analysis above, to prevent member exposure when their Merkle
 ```
 
 The membership proof interface is exactly the same as Semaphore's, but with smaller Merkle proofs and faster prover time.
+
+```shell
+    function verifyProof(
+        uint groupId,
+        uint[] calldata treeIds,
+        uint[8] calldata proof
+    )
+```
 
 ### Leave Group (optional)
 
