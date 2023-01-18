@@ -28,7 +28,12 @@ As a conclusion: fixed-size Merkle trees cannot meet the dynamic user demands fo
 
 
 ## The solution: Elastic Anonymous Group using Merkle Forest
-We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$ has the same meaning as in the single Merkle tree case, i.e., a group member will have an exposure probability of $1/2^g$. The new parameter $n$ is the number of trees in the forest, so in this case the max group size is $n*2^g$.
+
+### Elastic Size 
+
+We define elastic anonymous groups (EAG) with $G(g)$, where $g$ is the depth of each merkle tree and $2^g$ is the default privacy guarantee. Comparing with a fixed size merkle tree, EAG has a default privacy guarantee but has no size limit. 
+
+> Note: user can choose to boost up privacy guarantee using the elastic privacy guarantee technique introduced in [Next section](#elastic-privacy-guarantee)
 
 ```mermaid
     flowchart LR;
@@ -74,8 +79,10 @@ We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$
 ```
 
 With the new elastic group design. the original huge [Merkle tree membership circuit](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/tree.circom) can be reduced to
-* a smaller Merkle tree membership circuit, which outputs a root
+* a smaller Merkle tree membership circuit, which out=puts a root
 * find the output root in a look-up table
+
+### Elastic Privacy Guarantee
 
 this actually provide "elastic gurantee", suppose the follow cases:
 1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
@@ -197,10 +204,10 @@ The random-member-join strategy require more "merge" for privacy-gruantee prove,
 ## Advantages
 1. Elastic group : could be enlarged/downsized according to demands.
 2. Possibly infinite group.
-2. accurate fine-grained group size.
-3. Smaller Merkle proof circuits, faster prover.
-4. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a Macbook Pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
-5. Reduced concurrency competition when several users join a single group.
+3. accurate fine-grained group size.
+4. Smaller Merkle proof circuits, faster prover.
+5. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a Macbook Pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
+56. Reduced concurrency competition when several users join a single group.
 
 ## Specification
 
