@@ -202,6 +202,7 @@ So here, we proposal a hash-based random-member-join strategy, that is, select a
 The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
 
 ## Advantages
+TODO (Xinming): Merge advantages with motivation 
 1. Elastic group : could be enlarged/downsized according to demands.
 2. Possibly infinite group.
 3. accurate fine-grained group size.
