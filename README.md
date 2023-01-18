@@ -309,6 +309,6 @@ while trust setup time/ptau size growth Exponentially, which will benefit more f
 |20|160 min|1.1G|12K|3.3M|6.5s|
 |32|unfinished||18K|5.2M||
 
-## [Reference Implementation](./contracts/SMT/smt.sol)
+## [Reference Implementation](./contracts/elasticGroup/elasticGroup.sol)
 
 Fully compatible with Semaphore Interface, minor changes for implement eas.
