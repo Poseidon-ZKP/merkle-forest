@@ -1,4 +1,4 @@
-# Merkle Forest : ZK-friendly Elastic Group
+# ZK-Friendly Elastic Anonymous Group for Semaphore and More 
 
 ## Background
 [Semaphore](https://semaphore.appliedzkp.org/) is ZKP-powered protocol that allows users to:
