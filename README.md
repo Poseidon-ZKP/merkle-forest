@@ -27,7 +27,7 @@ Suppose the below scenarios:
 As a conclusion: fixed-size Merkle trees cannot meet the dynamic user demands for group memebership.
 
 
-## The solution: Merkle forest
+## The solution: Elastic Anonymous Group using Merkle Forest
 We need to redefine groups with a new formula $G(g, n)$, where the guarantee $g$ has the same meaning as in the single Merkle tree case, i.e., a group member will have an exposure probability of $1/2^g$. The new parameter $n$ is the number of trees in the forest, so in this case the max group size is $n*2^g$.
 
 ```mermaid
