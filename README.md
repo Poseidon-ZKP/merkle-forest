@@ -301,7 +301,6 @@ while trust setup time/ptau size growth Exponentially, which will benefit more f
 |Merkle Tree Depth|trust setup time |ptau size|constraints| pk size|prove time|
 |  ----  | ----  | ----  | ----  | ----  | ----  |
 |10|2.5 min|18M(ptau.14)|6.6K|2.8M|5.5s|
-<!-- circuit too big for this power of tau ceremony. 6649*2 > 2**10 -->
 |16|10 min|72M|9K|2.8M|5.5s|
 |20|160 min|1.1G|12K|3.3M|6.5s|
 |32|unfinished||18K|5.2M||
