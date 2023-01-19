@@ -20,11 +20,11 @@ The first two private inputs, siblings and path indices, form a path in a Merkle
 In the Semaphore example above, groups are modelled by binary incremental Merkle trees with fixed-size depth (privacy guarantee). The native way to prove group membership, as explained above, is to verify a Merkle path in a zk-circuit, which means this circuit depends on the tree depth. 
 
 Suppose the below scenarios:
-1. We have an almost full group. In order to enlarge the group, we would have to create a new group, and ask every member to rejoin.
-2. We want to create a group, but can't decide the guarantee yet, as it will depand on how the bussiness is going. The only choice in this case is the maximum possible guarantee, otherwise we may need to create a new group as soon as we need to enlarge ours as explained in point 1. But then, even at the beginning, when there are few members, we still have to generate full Merkle path proofs, resulting in non-efficent cost for both the prover and the on-chain verifier.
-3. [Optional] Users may join and leave a group frenquently, e.g. suppose 1 million users join and then leave. Even though the number of members at any time never exceeds the max group size, a group with a higher guarantee is still needed.
+1. Group is almost full. In order to enlarge the group, user would have to create a new group, and ask every member to rejoin. 
+2. User want to create a group, but can't decide the guarantee yet, as it might grow  infinitely as bussiness growth. Now the only choice is using an evaluated maximum possible guarantee, and have to enlarge when reach capacity limit. In this case, even at the beginning, when there are few members, we still have to generate full Merkle path proofs, resulting in non-efficent cost for both prover and on-chain verifier, and also have larger trust setup cost, For reference, a guarantee 20 trust setup takes 2 hours on Macbook Pro and produces more than 1G key file.
+3. multi user operate concurrently on the group, say, user A already in group, and try to prove membership, while at the same time, another user B try to join the group. if B's join transaction complete firstly (on-chain merkle tree updated), then A's membership prove transaction will fail, as still using old merkle path proof. 
 
-As a conclusion: fixed-size Merkle trees cannot meet the dynamic user demands for group memebership.
+As a conclusion: Group with underline single fixed-size Merkle tree, cann't adjust capacity dynamically, and could be conccurency competition , thus could not fulfill the variety real life user cases for group memebership, even with more cost.
 
 
 ## The solution: Elastic Anonymous Group using Merkle Forest
@@ -201,14 +201,9 @@ So here, we proposal a hash-based random-member-join strategy, that is, select a
 
 The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
 
-## Advantages
-TODO (Xinming): Merge advantages with motivation 
-1. Elastic group : could be enlarged/downsized according to demands.
-2. Possibly infinite group.
-3. accurate fine-grained group size.
-4. Smaller Merkle proof circuits, faster prover.
-5. Lighter trusted setup for zkey. For reference, a guarantee 20 Semaphore TS takes 2 hours on a Macbook Pro and produces a very big zkey file. This is inconvenient if the user has to download it for local proof generation.
-56. Reduced concurrency competition when several users join a single group.
+## Conclude
+
+We propose elastic group, with default infinite capacity, which can also be enlarge/downsize dynamically. The underline merkle forest using smaller Merkle tree as basic unit, take the benefit of smaller proof circuits, faster prover, Lighter trusted setup cost. Another benefit of merkle forest， is natively reslove the concurenccy competetion probablity. Finally we propose elastic gurantee, there will no any gurantee lost in elastic group.
 
 ## Specification
 
