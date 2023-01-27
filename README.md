@@ -1,5 +1,9 @@
 # ZK-Friendly Elastic Anonymous Group for Semaphore and More 
 
+We present EAS (ZK-Friendly Elastic Anonymous Group) based on a novel data structure - Merkle Forest. EAS can scale semaphore group to billions of users without increasing the proving time and the proving key size. EAS's core idea is the seperation of group size and anonymity guarantee. After using EAS in Semaphore, 
+1. with elastic (possibly unlimited) group size without increasing proving key size and prover time
+2. with elastic anonymity guarantee and allow the client to make the prover time / anonymity guarantee trade-off
+
 ## Background
 [Semaphore](https://semaphore.appliedzkp.org/) is ZKP-powered protocol that allows users to:
 * Prove their membership of a group 
@@ -12,12 +16,12 @@ The first two private inputs, siblings and path indices, form a path in a Merkle
 ## Terminology
 * [identity](https://semaphore.appliedzkp.org/docs/guides/identities): a triple consisting of a trapdoor, a nullifier and a commitment. The commitment is computed from the trapdoor and nullifier and is inserted as a leaf in the groups it belongs to.
 * Group: In the Semaphore protocol, a Merkle tree. In our proposal, a Merkle forest. 
-* Privacy Guarantee: a security parameter, the higher it is the lower the probability a member can be exposed in a group. In the Semaphore protocol above, it is the depth of the Merkle tree. For a guarantee $g$, the Merkle tree can store $2^g$ leaves, so the minimum exposure probability, achieved when the group reaches its maximum capacity, is $1/2^g$.
+* Anonymity Guarantee: a security parameter defined by the size of the anonymity set. In the Semaphore protocol above, it is the capacity of the Merkle tree. For a merkle tree with depth $g$, the Merkle tree can store $2^g$ leaves, so the exposure probability, achieved when the group reaches its maximum capacity, is $1/2^g$.
 * Max group size. Max number of members a group can host. In the Semaphore protocol, this is the number of leaves the Merkle tree can store.
 * EG: Elastic Group, whose size grows dynamically.
 
 ## Motivation
-In the Semaphore example above, groups are modelled by binary incremental Merkle trees with fixed-size depth (privacy guarantee). The native way to prove group membership, as explained above, is to verify a Merkle path in a zk-circuit, which means this circuit depends on the tree depth. 
+In the Semaphore example above, groups are modelled by binary incremental Merkle trees with fixed-size depth (anonymity guarantee). The native way to prove group membership, as explained above, is to verify a Merkle path in a zk-circuit, which means this circuit depends on the tree depth. 
 
 Suppose the below scenarios:
 1. Group is almost full. In order to enlarge the group, user would have to create a new group, and ask every member to rejoin. 
@@ -31,9 +35,9 @@ As a conclusion: Group with underline single fixed-size Merkle tree, cann't adju
 
 ### Elastic Size 
 
-We define elastic anonymous groups (EAG) with $G(g)$, where $g$ is the depth of each merkle tree and $2^g$ is the default privacy guarantee. Comparing with a fixed size merkle tree, EAG has a default privacy guarantee but has no size limit. 
+We define elastic anonymous groups (EAG) with $G(g)$, where $g$ is the depth of each merkle tree and $2^g$ is the default anonymity guarantee. Comparing with a fixed size merkle tree, EAG has a default anonymity guarantee but has no size limit. 
 
-> Note: user can choose to boost up privacy guarantee using the elastic privacy guarantee technique introduced in [Next section](#elastic-privacy-guarantee)
+> Note: user can choose to boost up anonymity guarantee using the elastic anonymity guarantee technique introduced in [Next section](#elastic-anonymity-guarantee)
 
 ```mermaid
     flowchart LR;
@@ -82,12 +86,12 @@ With the new elastic group design. the original huge [Merkle tree membership cir
 * a smaller Merkle tree membership circuit, which out=puts a root
 * find the output root in a look-up table
 
-### Elastic Privacy Guarantee
+### Elastic Anonymity Guarantee
 
 this actually provide "elastic gurantee", suppose the follow cases:
 1. user provide the "treeId" of elastic group, and merkle proof of that tree, get a minium grantee.
-2. user join a tree which have less leaves, which means it might loss privacy, then user could "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree. As an example in Figure 2, if member 4 want to prove membership with privacy grantee 2, then it can merge serveal trees to make the total members is more than 2**2 in new tree, here merge tree 2 and 3, and provide the merkle proof of new tree.  
-3. user might want higher privacy gurantee, by "merge" all the trees. user decide the gurantee they want. Figure 2 given an example of merge 4 trees in group.
+2. user join a tree which have less leaves, which means it might loss privacy, then user could "merge" its original tree and another full-size tree to be a new tree, and provide membership in the new tree. As an example in Figure 2, if member 4 want to prove membership with anonymity grantee 2, then it can merge serveal trees to make the total members is more than 2**2 in new tree, here merge tree 2 and 3, and provide the merkle proof of new tree.  
+3. user might want higher anonymity gurantee, by "merge" all the trees. user decide the gurantee they want. Figure 2 given an example of merge 4 trees in group.
 
 ```mermaid
     flowchart TD;
@@ -199,7 +203,7 @@ So here, we proposal a hash-based random-member-join strategy, that is, select a
 ```
 
 
-The random-member-join strategy require more "merge" for privacy-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
+The random-member-join strategy require more "merge" for anonymity-gruantee prove, because of each tree might be sparse in the number of leaves, and need caculate a list of trees to be merged.  it actually bring unneed burden of the 1st user case, who has no concurrency demands. We can simply apply a "sequential-member-join" strategy instead, for this case, Figure 1 give an example, member always join current tree until it's full. 
 
 ## Conclude
 
