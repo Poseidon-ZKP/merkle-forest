@@ -1,8 +1,8 @@
 # ZK-Friendly Elastic Anonymous Group for Semaphore and More 
 
-We present EAS (ZK-Friendly Elastic Anonymous Group) based on a novel data structure - Merkle Forest. EAS can scale semaphore group to billions of users without increasing the proving time and the proving key size. EAS's core idea is the seperation of group size and anonymity guarantee. After using EAS in Semaphore, 
-1. with elastic (possibly unlimited) group size without increasing proving key size and prover time
-2. with elastic anonymity guarantee and allow the client to make the prover time / anonymity guarantee trade-off
+We present EAS (ZK-Friendly Elastic Anonymous Group) based on a novel data structure - Merkle Forest. EAS can scale semaphore group to billions of users without increasing the proving time and the proving key size. EAS's core idea is the seperation of group size and anonymity guarantee. With EAS, semaphore protocl could achieve:
+1. Elastic (possibly unlimited) group size without increasing proving key size and prover time.
+2. Elastic anonymity guarantee that allows the client to make the prover time / anonymity guarantee trade-off.
 
 ## Background
 [Semaphore](https://semaphore.appliedzkp.org/) is ZKP-powered protocol that allows users to:
