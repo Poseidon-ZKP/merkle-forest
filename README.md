@@ -1,6 +1,6 @@
 # ZK-Friendly Elastic Anonymous Group for Semaphore and More 
 
-We present EAS (ZK-Friendly Elastic Anonymous Group) based on a novel data structure - Merkle Forest. EAS can scale semaphore group to billions of users without increasing the proving time and the proving key size. EAS's core idea is the seperation of group size and anonymity guarantee. With EAS, semaphore protocl could achieve:
+We present EAG (ZK-Friendly Elastic Anonymous Group) based on a novel data structure - Merkle Forest. EAG can scale semaphore group to billions of users without increasing the proving time and the proving key size. EAG's core idea is the seperation of group size and anonymity guarantee. With EAG, semaphore protocl could achieve:
 1. Elastic (possibly unlimited) group size without increasing proving key size and prover time.
 2. Elastic anonymity guarantee that allows the client to make the prover time / anonymity guarantee trade-off.
 
@@ -18,7 +18,7 @@ The first two private inputs, siblings and path indices, form a path in a Merkle
 * Group: In the Semaphore protocol, a Merkle tree. In our proposal, a Merkle forest. 
 * Anonymity Guarantee: a security parameter defined by the size of the anonymity set. In the Semaphore protocol above, it is the capacity of the Merkle tree. For a merkle tree with depth $g$, the Merkle tree can store $2^g$ leaves, so the exposure probability, achieved when the group reaches its maximum capacity, is $1/2^g$.
 * Max group size. Max number of members a group can host. In the Semaphore protocol, this is the number of leaves the Merkle tree can store.
-* EG: Elastic Group, whose size grows dynamically.
+* EAG: Elastic Group, whose size grows dynamically.
 
 ## Motivation
 In the Semaphore example above, groups are modelled by binary incremental Merkle trees with fixed-size depth (anonymity guarantee). The native way to prove group membership, as explained above, is to verify a Merkle path in a zk-circuit, which means this circuit depends on the tree depth. 
@@ -228,7 +228,7 @@ An onchain lookup table is introduced to map members to the corresponding Merkle
         uint zeroValue)
 ```
 
-Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^{10} = 1024$ members, which means this EAS has 1/1024 anonymity. This EG can have maximum $2^{10}*4 = 4096$ leaves.
+Creates a new elastic group, with user-provided anonymity guarantee and number of trees. For example, if the user sets the anonymity guarantee to be 10 and the number of trees size to be 4, then each Merkle tree in this forest has $2^{10} = 1024$ members, which means this EAG has 1/1024 anonymity. This EAG can have maximum $2^{10}*4 = 4096$ leaves.
 
 We use an [incremental Merkle tree](https://github.com/privacy-scaling-explorations/zk-kit/tree/main/packages/incremental-merkle-tree) which is fully compatible with Semaphore.
 
@@ -289,7 +289,7 @@ Decrease only succeeds if the group's member number does not exceed the new max 
 
 ### Migrate existing group
 
-Existing semaphore group can be migrated to EAS easily as the first shard. (more details later)
+Existing semaphore group can be migrated to EAG easily as the first shard. (more details later)
 
 <!-- ### Composable/CP-Snark(optional)
 
