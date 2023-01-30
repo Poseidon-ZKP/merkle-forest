@@ -289,7 +289,7 @@ Decrease only succeeds if the group's member number does not exceed the new max 
 
 ### Migrate existing group
 
-TODO : Migrate existing group as 1 MT of the MT Forest.
+Existing semaphore group can be migrated to EAS easily as the first shard. (more details later)
 
 <!-- ### Composable/CP-Snark(optional)
 
