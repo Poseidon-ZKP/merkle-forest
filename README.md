@@ -37,52 +37,10 @@ As a conclusion: Group with underline single fixed-size Merkle tree, cann't adju
 
 We define elastic anonymous groups (EAG) with $G(g)$, where $g$ is the depth of each merkle tree and $2^g$ is the default anonymity guarantee. Comparing with a fixed size merkle tree, EAG has a default anonymity guarantee but has no size limit. 
 
-![Figure 1](./docs/split.png)
-
 > Note: user can choose to boost up anonymity guarantee using the elastic anonymity guarantee technique introduced in [Next section](#elastic-anonymity-guarantee)
 
-```mermaid
-    flowchart LR;
-        title[Figure 1. Merkle Forest]
-        style single-MT fill:#FBFCFC
-        style Merkle-Forest fill:#FBFCFC
-        style Lookup-Table fill:#FBFCFC
-        style MT1 fill:#FBFCFC
-        style MT2 fill:#FBFCFC
-        subgraph single-MT
-            R((Root))-->C1234 & C5678;
-            C1234((C1-4)) --> C12((C12)) & C34((C34));
-            C5678((C5-8)) --> C56((C56)) & C78((C78));
-            C12-->L1(1) & L2(2)
-            C34-->L3(3) & L4(4)
-            C56-->L5(5) & L6(6)
-            C78-->L7(7)
-        end
 
-        subgraph Merkle-Forest
-            subgraph Lookup-Table
-                LT1(1..4)
-                LT5(5..8)
-            end
-            LT1 -.-> FC1234;
-            LT5 -.-> FC5678;
-
-            subgraph MT1
-                FC1234((R1-4)) --> FC12((C12)) & FC34((C34));
-                FC12-->FL1(1) & FL2(2)
-                FC34-->FL3(3) & FL4(4)
-            end
-
-            subgraph MT2
-                FC5678((R5-8)) --> FC56((C56)) & FC78((C78));
-                FC56-->FL5(5) & FL6(6)
-                FC78-->FL7(7)
-            end
-        end
-
-        single-MT -.-> Merkle-Forest
-
-```
+![Figure 1](./docs/split.png)
 
 With the new elastic group design. the original huge [Merkle tree membership circuit](https://github.com/semaphore-protocol/semaphore/blob/main/packages/circuits/tree.circom) can be reduced to
 * a smaller Merkle tree membership circuit, which out=puts a root
