@@ -37,7 +37,7 @@ As a conclusion: Group with underline single fixed-size Merkle tree, cann't adju
 
 We define elastic anonymous groups (EAG) with $G(g)$, where $g$ is the depth of each merkle tree and $2^g$ is the default anonymity guarantee. Comparing with a fixed size merkle tree, EAG has a default anonymity guarantee but has no size limit. 
 
-![Figure 1](./docs/split.jpg)
+![Figure 1](./docs/split.png)
 
 > Note: user can choose to boost up anonymity guarantee using the elastic anonymity guarantee technique introduced in [Next section](#elastic-anonymity-guarantee)
 
